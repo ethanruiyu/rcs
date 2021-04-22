@@ -1,0 +1,104 @@
+[
+  {
+    "model": "core.PointTypeModel",
+    "pk": 1,
+    "fields": {
+      "name": "ROUTE_POINT"
+    }
+  },
+  {
+    "model": "core.PointTypeModel",
+    "pk": 2,
+    "fields": {
+      "name": "PARK_POINT"
+    }
+  },
+  {
+    "model": "core.PointTypeModel",
+    "pk": 3,
+    "fields": {
+      "name": "CHARGE_POINT"
+    }
+  },
+  {
+    "model": "core.VehicleSettingModel",
+    "pk": 1,
+    "fields": {
+      "key": "length",
+      "value": 0,
+      "description": "vehicle length"
+    }
+  },
+  {
+    "model": "core.VehicleSettingModel",
+    "pk": 2,
+    "fields": {
+      "key": "energyLevelCritical",
+      "value": 30,
+      "description": "The value at/below which the vehicle's energy level is considered \"critical\"."
+    }
+  },
+  {
+    "model": "core.VehicleSettingModel",
+    "pk": 3,
+    "fields": {
+      "key": "energyLevelSufficiently",
+      "value": 80,
+      "description": "The value at/above which the vehicle's energy level is considered sufficiently recharged."
+    }
+  },
+  {
+    "model": "core.VehicleSettingModel",
+    "pk": 4,
+    "fields": {
+      "key": "maxVelocity",
+      "value": 1,
+      "description": "This vehicle's maximum velocity (in mm/s)."
+    }
+  },
+  {
+    "model": "core.VehicleSettingModel",
+    "pk": 5,
+    "fields": {
+      "key": "maxReverseVelocity",
+      "value": 1,
+      "description": "This vehicle's maximum reverse velocity (in mm/s)."
+    }
+  },
+  {
+    "model": "core.GlobalSettingModel",
+    "pk": 1,
+    "fields": {
+      "key": "missionPriorities",
+      "value": 1,
+      "description": "Keys by which to prioritize transport orders for assignment.\nPossible values:\nBY_AGE: Sort by age, oldest first.\nBY_DEADLINE: Sort by deadline, most urgent first.\nDEADLINE_AT_RISK_FIRST: Sort orders with deadlines at risk first.\nBY_NAME: Sort by name, lexicographically."
+    }
+  },
+  {
+    "model": "core.GlobalSettingModel",
+    "pk": 2,
+    "fields": {
+      "key": "vehiclePriorities",
+      "value": 2,
+      "description": "Keys by which to prioritize vehicle candidates for assignment.\nPossible values:\nBY_ENERGY_LEVEL: Sort by energy level of the vehicle, highest first.\nIDLE_FIRST: Sort vehicles with state IDLE first.\nBY_COMPLETE_ROUTING_COSTS: Sort by complete routing costs, lowest first.\nBY_INITIAL_ROUTING_COSTS: Sort by routing costs for the first destination.\nBY_VEHICLE_NAME: Sort by vehicle name, lexicographically."
+    }
+  },
+  {
+    "model": "core.GlobalSettingModel",
+    "pk": 3,
+    "fields": {
+      "key": "parkIdleVehicles",
+      "value": 3,
+      "description": "Whether to automatically create parking orders for idle vehicles."
+    }
+  },
+  {
+    "model": "core.GlobalSettingModel",
+    "pk": 4,
+    "fields": {
+      "key": "rechargeIdleVehicles",
+      "value": 4,
+      "description": "Whether to automatically create recharge orders for idle vehicles."
+    }
+  }
+]

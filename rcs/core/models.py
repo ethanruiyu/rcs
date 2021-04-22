@@ -81,16 +81,16 @@ class PathModel(models.Model):
 
 
 class VehicleModel(models.Model):
-    VEHICLE_STATE = (
-        (0, 'offline'),
-        (1, 'idle'),
-        (2, 'busy'),
-        (3, 'pause'),
-        (4, 'error'),
-        (5, 'charging')
-    )
+    class State(models.TextChoices):
+        OFFLINE = 'offline'
+        IDLE = 'idle'
+        BUSY = 'busy'
+        PAUSE = 'pause'
+        ERROR = 'error'
+        CHARGING = 'charging'
+
     name = models.CharField(max_length=64)
-    state = models.IntegerField(choices=VEHICLE_STATE, default=0)
+    state = models.IntegerField(choices=State.choices, default=0)
     position = models.JSONField(default=dict)
     nextPosition = models.JSONField(default=dict, db_column='nextPosition')
     group = models.ForeignKey('core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
