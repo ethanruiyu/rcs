@@ -18,6 +18,8 @@ docs/_build/
 
 # Environments
 .env/
-.venv/
+venv/
 
 
+docs/build/
+templates/
