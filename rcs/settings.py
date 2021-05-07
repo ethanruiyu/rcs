@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rcs.core',
+    'rcs.account',
     'drf_yasg'
 ]
 
@@ -120,4 +121,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Default superuser password
 DJANGO_SUPERUSER_PASSWORD = '123456'
+
+AUTH_USER_MODEL = 'account.User'

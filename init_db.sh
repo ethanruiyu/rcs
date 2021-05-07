@@ -1,8 +1,13 @@
 #!/bin/bash
 export DJANGO_SUPERUSER_PASSWORD=123456
 
-python manage.py makemigrations
+rm -rf rcs/core/migrations
+rm -rf rcs/common/migrations
+rm -rf rcs/account/migrations
+rm -rf rcs/adapter/migrations
+
+python manage.py makemigrations account core
 python manage.py migrate
-#python manage.py loaddata fixtures
-python manage.py createsuperuser --noinput --username=rcs --email=rcs@rcs.com
+python manage.py loaddata rcs/core/fixtures/core.json
+python manage.py createsuperuser --noinput --username=rcs
 
