@@ -21,3 +21,5 @@ docs/_build/
 /venv/
 
 
+docs/build/
+templates/
