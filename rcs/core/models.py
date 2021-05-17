@@ -1,6 +1,15 @@
 from django.db import models
 
 
+class VehicleState(models.TextChoices):
+    OFFLINE = 'offline'
+    IDLE = 'idle'
+    BUSY = 'busy'
+    PAUSE = 'pause'
+    ERROR = 'error'
+    CHARGING = 'charging'
+
+
 class MapModel(models.Model):
     name = models.CharField(max_length=64)
     description = models.TextField(null=True)
@@ -81,16 +90,8 @@ class PathModel(models.Model):
 
 
 class VehicleModel(models.Model):
-    class State(models.TextChoices):
-        OFFLINE = 'offline'
-        IDLE = 'idle'
-        BUSY = 'busy'
-        PAUSE = 'pause'
-        ERROR = 'error'
-        CHARGING = 'charging'
-
     name = models.CharField(max_length=64)
-    state = models.IntegerField(choices=State.choices, default=0)
+    state = models.IntegerField(choices=VehicleState.choices, default=0)
     position = models.JSONField(default=dict)
     nextPosition = models.JSONField(default=dict, db_column='nextPosition')
     group = models.ForeignKey('core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')

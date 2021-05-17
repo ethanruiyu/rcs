@@ -19,7 +19,7 @@ docs/_build/
 
 # Environments
 /venv/
-
+venv/
 
 docs/build/
 templates/

@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from core.models import *
+from rcs.core.models import *
 
 
 class MapSerializer(ModelSerializer):
@@ -20,6 +20,16 @@ class PointSerializer(ModelSerializer):
 
     class Meta:
         model = PointModel
+        fields = '__all__'
+
+
+class PointTypeSerializer(ModelSerializer):
+    """
+    Point Type model serializer
+    """
+
+    class Meta:
+        model = PointTypeModel
         fields = '__all__'
 
 

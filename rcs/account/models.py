@@ -39,8 +39,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
+    real_name = models.CharField(max_length=64, null=True)
     settings = models.JSONField(default=dict)
+    department = models.CharField(max_length=64, null=True)
 
     class Meta:
         db_table = 'rcs_user_profile'
