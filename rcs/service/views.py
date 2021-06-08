@@ -1,11 +1,12 @@
 from rest_framework.viewsets import ModelViewSet
-
+from .paginations import *
 from .serializers import *
 
 
 class MapViewSet(ModelViewSet):
     serializer_class = MapSerializer
     queryset = MapModel.objects.all()
+    pagination_class = MapPagination
 
 
 class PointViewSet(ModelViewSet):

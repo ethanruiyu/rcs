@@ -1,4 +1,12 @@
 from django.db import models
+from colorfield.fields import ColorField
+
+
+def get_dir_name(instance, filename):
+    """
+    FileField prefix dir
+    """
+    return '{0}/{1}'.format(instance.name, filename)
 
 
 class VehicleState(models.TextChoices):
@@ -13,6 +21,12 @@ class VehicleState(models.TextChoices):
 class MapModel(models.Model):
     name = models.CharField(max_length=64)
     description = models.TextField(null=True)
+    createTime = models.DateTimeField(auto_now_add=True, db_column='createTime')
+    updateTime = models.DateTimeField(auto_now=True, db_column='updateTime')
+    raw = models.JSONField(default=list)
+    config = models.JSONField(default=dict)
+    active = models.BooleanField(default=False)
+    file = models.FileField(upload_to=get_dir_name, blank=True)
 
     class Meta:
         db_table = 'rcs_map'
@@ -24,6 +38,7 @@ class PointModel(models.Model):
     position = models.JSONField(default=dict)
     orientation = models.JSONField(default=dict)
     group = models.ForeignKey('core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
+    active = models.BooleanField(default=True)
     map = models.ForeignKey('core.MapModel', on_delete=models.CASCADE, db_column='mapId')
 
     class Meta:
@@ -90,6 +105,11 @@ class PathModel(models.Model):
 
 
 class VehicleModel(models.Model):
+    COLOR_CHOICES = (
+        ('#FFFFFF', '#FFFFFF'),
+        ('#2975E6', '#2975E6'),
+        ('#F4D517', '#F4D517')
+    )
     name = models.CharField(max_length=64)
     state = models.IntegerField(choices=VehicleState.choices, default=0)
     position = models.JSONField(default=dict)

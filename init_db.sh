@@ -1,5 +1,4 @@
 #!/bin/bash
-export DJANGO_SUPERUSER_PASSWORD=123456
 
 rm -rf rcs/core/migrations
 rm -rf rcs/common/migrations
