@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, DateTimeField
 
 from rcs.core.models import *
 
@@ -7,6 +7,8 @@ class MapSerializer(ModelSerializer):
     """
     Map model serializer
     """
+    createTime = DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
+    updateTime = DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
 
     class Meta:
         model = MapModel
