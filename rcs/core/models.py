@@ -6,11 +6,18 @@ from django.db import models
 from django.dispatch import receiver
 
 
-def get_dir_name(instance, filename):
+def map_dir_name(instance, filename):
     """
     FileField prefix dir
     """
     return 'maps/{0}/{1}'.format(instance.name, filename)
+
+
+def vehicle_dir_name(instance, filename):
+    """
+    FileField prefix dir
+    """
+    return 'vehicles/{0}/{1}'.format(instance.name, filename)
 
 
 class VehicleState(models.TextChoices):
@@ -31,7 +38,7 @@ class MapModel(models.Model):
     raw = models.JSONField(default=list)
     config = models.JSONField(default=dict)
     active = models.BooleanField(default=False)
-    file = models.FileField(upload_to=get_dir_name, blank=True)
+    file = models.FileField(upload_to=map_dir_name, blank=True)
 
     class Meta:
         db_table = 'rcs_map'
@@ -54,16 +61,18 @@ class PointModel(models.Model):
 
 class PointTypeModel(models.Model):
     name = models.CharField(max_length=64)
-
-    # group = models.ForeignKey('core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
-    # map = models.ForeignKey('core.MapModel', on_delete=models.CASCADE, db_column='mapId')
+    description = models.TextField(null=True)
 
     class Meta:
         db_table = 'rcs_point_type'
         verbose_name = 'Point Type'
 
+    def __str__(self):
+        return self.name
+
 
 class BlockModel(models.Model):
+    name = models.CharField(max_length=64)
     group = models.ForeignKey(
         'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
     map = models.ForeignKey(
@@ -74,6 +83,7 @@ class BlockModel(models.Model):
 
 
 class AreaModel(models.Model):
+    name = models.CharField(max_length=64)
     group = models.ForeignKey(
         'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
     map = models.ForeignKey(
@@ -131,6 +141,7 @@ class VehicleModel(models.Model):
         'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
+    image = models.FileField(upload_to=vehicle_dir_name, blank=True)
 
     class Meta:
         db_table = 'rcs_vehicle'
