@@ -20,15 +20,6 @@ def vehicle_dir_name(instance, filename):
     return 'vehicles/{0}/{1}'.format(instance.name, filename)
 
 
-class VehicleState(models.TextChoices):
-    OFFLINE = 'offline'
-    IDLE = 'idle'
-    BUSY = 'busy'
-    PAUSE = 'pause'
-    ERROR = 'error'
-    CHARGING = 'charging'
-
-
 class MapModel(models.Model):
     name = models.CharField(max_length=64)
     description = models.TextField(null=True)
@@ -44,9 +35,20 @@ class MapModel(models.Model):
         db_table = 'rcs_map'
 
 
+class PointTypeModel(models.Model):
+    name = models.CharField(max_length=64)
+    description = models.TextField(null=True)
+
+    class Meta:
+        db_table = 'rcs_point_type'
+
+    def __str__(self):
+        return self.name
+
+
 class PointModel(models.Model):
     name = models.CharField(max_length=64)
-    type = models.ForeignKey('core.PointTypeModel', on_delete=models.CASCADE)
+    type = models.ForeignKey('core.PointTypeModel', on_delete=models.CASCADE, null=True)
     position = models.JSONField(default=dict)
     orientation = models.JSONField(default=dict)
     group = models.ForeignKey(
@@ -54,21 +56,10 @@ class PointModel(models.Model):
     active = models.BooleanField(default=True)
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
+    disabled = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'rcs_point'
-
-
-class PointTypeModel(models.Model):
-    name = models.CharField(max_length=64)
-    description = models.TextField(null=True)
-
-    class Meta:
-        db_table = 'rcs_point_type'
-        verbose_name = 'Point Type'
-
-    def __str__(self):
-        return self.name
 
 
 class BlockModel(models.Model):
@@ -133,19 +124,35 @@ class PathModel(models.Model):
 
 
 class VehicleModel(models.Model):
+    VEHICLE_STATE = (
+        (0, 'offline'),
+        (1, 'idle'),
+        (2, 'busy'),
+        (3, 'pause'),
+        (4, 'error'),
+        (5, 'charging')
+    )
     name = models.CharField(max_length=64)
-    state = models.IntegerField(choices=VehicleState.choices, default=0)
+    state = models.IntegerField(choices=VEHICLE_STATE, default='offline')
     position = models.JSONField(default=dict)
     nextPosition = models.JSONField(default=dict, db_column='nextPosition')
     group = models.ForeignKey(
-        'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
+        'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId', blank=True)
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
     image = models.FileField(upload_to=vehicle_dir_name, blank=True)
+    power = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'rcs_vehicle'
         verbose_name = 'Vehicle'
+
+
+class VehicleTypeModel(models.Model):
+    name = models.CharField(max_length=64)
+
+    class Meta:
+        db_table = 'rcs_vehicle_type'
 
 
 class VehicleSettingModel(models.Model):

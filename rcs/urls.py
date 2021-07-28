@@ -18,10 +18,14 @@ from django.contrib import admin
 from django.views.static import serve
 from django.urls import path, include
 from django.conf import settings
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('rcs.service.urls')),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 
     url(r'media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT, 'show_indexes': True}),
 ]

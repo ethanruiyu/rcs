@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.TextField(unique=True)
+    username = models.CharField(unique=True, max_length=64)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=True)
