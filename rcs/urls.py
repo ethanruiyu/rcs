@@ -19,7 +19,7 @@ from django.views.static import serve
 from django.urls import path, include
 from django.conf import settings
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-
+from rcs.simulator.views import Simulator
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,3 +29,7 @@ urlpatterns = [
 
     url(r'media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT, 'show_indexes': True}),
 ]
+
+sim = Simulator('Robot-1')
+sim.setDaemon(True)
+sim.start()

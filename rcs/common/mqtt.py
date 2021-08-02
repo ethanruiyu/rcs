@@ -25,7 +25,7 @@ class MqttClient(threading.Thread):
         if rc != 0:
             LOG.error('MQTT server connect fail, error code with {0}'.format(rc))
         else:
-            LOG.info('MQTT connected with {0}'.format(str(self._client_name, encoding='utf-8')))
+            LOG.info('MQTT connected with {0}'.format(self._client_name))
 
     def on_disconnect(self):
         pass
@@ -33,6 +33,7 @@ class MqttClient(threading.Thread):
     def run(self) -> None:
         try:
             LOG.info('{0} mqtt thread start.'.format(self._client_name))
+            self._client.connect(host='localhost', port=1883)
             self._client.loop_forever()
         except ConnectionRefusedError as e:
             LOG.error(e.__context__)
