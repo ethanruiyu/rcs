@@ -27,7 +27,7 @@ class MqttClient(threading.Thread):
         else:
             LOG.info('MQTT connected with {0}'.format(self._client_name))
 
-    def on_disconnect(self):
+    def on_disconnect(self, userdata, rc):
         pass
 
     def run(self) -> None:

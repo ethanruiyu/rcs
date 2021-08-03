@@ -30,6 +30,6 @@ urlpatterns = [
     url(r'media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT, 'show_indexes': True}),
 ]
 
-sim = Simulator('Robot-1')
-sim.setDaemon(True)
-sim.start()
+# sim = Simulator('Robot-1')
+# sim.setDaemon(True)
+# sim.start()

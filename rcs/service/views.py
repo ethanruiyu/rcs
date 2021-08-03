@@ -7,6 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .paginations import *
 from .serializers import *
+from PIL import Image
 
 
 class MapViewSet(ModelViewSet):
@@ -19,12 +20,25 @@ class MapViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+
+        name = request.data.get('name')
         # read .zip file
         zp = request.data.get('file', None)
         if zp:
             zip_obj = zipfile.ZipFile(zp)
             for file in zip_obj.namelist():
-                zip_obj.extract(file, 'media/maps/{0}'.format(request.data.get('name')))
+                zip_obj.extract(file, 'media/maps/{0}'.format(name))
+
+        im = Image.open('media/maps/{0}/map.png'.format(name))
+        width, height = im.size
+
+        if self.queryset.filter(name=name).exists():
+            obj = self.queryset.get(name=name)
+            obj.config = {
+                'width': width,
+                'height': height
+            }
+            obj.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(methods=['delete'], detail=False)

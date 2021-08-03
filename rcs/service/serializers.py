@@ -1,21 +1,22 @@
-from rest_framework.serializers import ModelSerializer, DateTimeField
-
+from rest_framework import serializers
 from rcs.core.models import *
 
 
-class MapSerializer(ModelSerializer):
+class MapSerializer(serializers.ModelSerializer):
     """
     Map model serializer
     """
-    createTime = DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
-    updateTime = DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
+    name = serializers.CharField(required=False)
+    createTime = serializers.DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
+    updateTime = serializers.DateTimeField(format='%Y-%m-%d %H:%M', read_only=True)
+    active = serializers.BooleanField()
 
     class Meta:
         model = MapModel
         fields = '__all__'
 
 
-class PointSerializer(ModelSerializer):
+class PointSerializer(serializers.ModelSerializer):
     """
     Point model serializer
     """
@@ -25,7 +26,7 @@ class PointSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class PointTypeSerializer(ModelSerializer):
+class PointTypeSerializer(serializers.ModelSerializer):
     """
     Point Type model serializer
     """
@@ -35,7 +36,7 @@ class PointTypeSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class BlockSerializer(ModelSerializer):
+class BlockSerializer(serializers.ModelSerializer):
     """
     Block model serializer
     """
@@ -45,7 +46,7 @@ class BlockSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class AreaSerializer(ModelSerializer):
+class AreaSerializer(serializers.ModelSerializer):
     """
     Area model serializer
     """
@@ -55,7 +56,7 @@ class AreaSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class PathSerializer(ModelSerializer):
+class PathSerializer(serializers.ModelSerializer):
     """
     Path model serializer
     """
@@ -65,7 +66,7 @@ class PathSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class VehicleSerializer(ModelSerializer):
+class VehicleSerializer(serializers.ModelSerializer):
     """
     Vehicle model serializer
     """
@@ -75,7 +76,7 @@ class VehicleSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class VehicleSettingSerializer(ModelSerializer):
+class VehicleSettingSerializer(serializers.ModelSerializer):
     """
     Vehicle Setting model serializer
     """
@@ -85,7 +86,7 @@ class VehicleSettingSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class GlobalSettingSerializer(ModelSerializer):
+class GlobalSettingSerializer(serializers.ModelSerializer):
     """
     Global Setting model serializer
     """

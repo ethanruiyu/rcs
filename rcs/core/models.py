@@ -34,6 +34,18 @@ class MapModel(models.Model):
     class Meta:
         db_table = 'rcs_map'
 
+    def save(self, *args, **kwargs):
+        if self.active:
+            try:
+                temp = MapModel.objects.get(active=True)
+                if self != temp:
+                    temp.active = False
+                    temp.save()
+            except MapModel.DoesNotExist:
+                pass
+
+        super(MapModel, self).save(*args, **kwargs)
+
 
 class PointTypeModel(models.Model):
     name = models.CharField(max_length=64)
@@ -138,8 +150,8 @@ class VehicleModel(models.Model):
     nextPosition = models.JSONField(default=dict, db_column='nextPosition')
     group = models.ForeignKey(
         'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId', blank=True)
-    map = models.ForeignKey(
-        'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
+    # map = models.ForeignKey(
+    #     'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
     image = models.FileField(upload_to=vehicle_dir_name, blank=True)
     power = models.IntegerField(default=0)
 
