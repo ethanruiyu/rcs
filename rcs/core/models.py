@@ -145,7 +145,7 @@ class VehicleModel(models.Model):
         (5, 'charging')
     )
     name = models.CharField(max_length=64)
-    state = models.IntegerField(choices=VEHICLE_STATE, default='offline')
+    state = models.IntegerField(choices=VEHICLE_STATE, default=0)
     position = models.JSONField(default=dict)
     nextPosition = models.JSONField(default=dict, db_column='nextPosition')
     group = models.ForeignKey(
@@ -154,6 +154,7 @@ class VehicleModel(models.Model):
     #     'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
     image = models.FileField(upload_to=vehicle_dir_name, blank=True)
     power = models.IntegerField(default=0)
+    active = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'rcs_vehicle'

@@ -13,12 +13,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
-from django.views.static import serve
 from django.urls import path, include
-from django.conf import settings
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from django.views.static import serve
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rcs.simulator.views import Simulator
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -37,6 +37,6 @@ urlpatterns = [
     url(r'media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT, 'show_indexes': True}),
 ]
 
-# sim = Simulator('Robot-1')
-# sim.setDaemon(True)
-# sim.start()
+sim = Simulator('Robot-1')
+sim.setDaemon(True)
+sim.start()

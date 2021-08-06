@@ -25,4 +25,4 @@ class Simulator(Thread):
         self.client.start()
 
     def pub_heartbeat(self):
-        self.client.publish('/base/{0}/heartbeat'.format(self.name), json.dumps({'time': '111'}))
+        self.client.publish('/vehicle/{0}/heartbeat'.format(self.name), json.dumps({'time': '111'}))

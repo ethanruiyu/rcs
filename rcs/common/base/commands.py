@@ -1,5 +1,5 @@
-from datetime import datetime
 from abc import ABC
+from datetime import datetime
 
 
 class BaseCommand(ABC):
@@ -33,4 +33,3 @@ class Continue(BaseCommand):
     def __init__(self):
         super(Continue, self).__init__()
         self._timestamp = datetime.now().timestamp()
-

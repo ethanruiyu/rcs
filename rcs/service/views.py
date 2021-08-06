@@ -1,13 +1,13 @@
 import zipfile
 
+from PIL import Image
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
-
+from rcs.adapter.comm import scan_vehicles
 from .paginations import *
 from .serializers import *
-from PIL import Image
 
 
 class MapViewSet(ModelViewSet):
@@ -80,6 +80,19 @@ class PathViewSet(ModelViewSet):
 class VehicleViewSet(ModelViewSet):
     serializer_class = VehicleSerializer
     queryset = VehicleModel.objects.all()
+
+    @action(methods=['get'], detail=False)
+    def scan(self, request, *args, **kwargs):
+        return Response(data=scan_vehicles)
+
+    @action(methods=['post'], detail=False)
+    def register(self, request, *args, **kwargs):
+        vehicle_name = request.data.get('name', None)
+        if vehicle_name is not None and not VehicleModel.objects.filter(name=vehicle_name).exists():
+            VehicleModel.objects.create(name=vehicle_name)
+            scan_vehicles.remove(vehicle_name)
+
+        return Response(data='')
 
 
 class VehicleSettingViewSet(ModelViewSet):
