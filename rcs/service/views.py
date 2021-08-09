@@ -5,15 +5,19 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
-from rcs.adapter.comm import scan_vehicles
+from rcs.adapter.adapter import scan_vehicles
 from .paginations import *
 from .serializers import *
+from .filters import *
+from django_filters import rest_framework
 
 
 class MapViewSet(ModelViewSet):
     serializer_class = MapSerializer
     queryset = MapModel.objects.all()
     pagination_class = MapPagination
+    filter_class = MapFilter
+    filter_backends = [rest_framework.DjangoFilterBackend]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

@@ -63,8 +63,6 @@ class PointModel(models.Model):
     type = models.ForeignKey('core.PointTypeModel', on_delete=models.CASCADE, null=True)
     position = models.JSONField(default=dict)
     orientation = models.JSONField(default=dict)
-    group = models.ForeignKey(
-        'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
     active = models.BooleanField(default=True)
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
@@ -76,8 +74,6 @@ class PointModel(models.Model):
 
 class BlockModel(models.Model):
     name = models.CharField(max_length=64)
-    group = models.ForeignKey(
-        'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
 
@@ -87,8 +83,6 @@ class BlockModel(models.Model):
 
 class AreaModel(models.Model):
     name = models.CharField(max_length=64)
-    group = models.ForeignKey(
-        'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
 
@@ -97,8 +91,6 @@ class AreaModel(models.Model):
 
 
 class AreaTypeModel(models.Model):
-    group = models.ForeignKey(
-        'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
 
@@ -106,10 +98,8 @@ class AreaTypeModel(models.Model):
         db_table = 'rcs_area_type'
 
 
-class GroupModel(models.Model):
+class VehicleGroupModel(models.Model):
     name = models.CharField(max_length=64)
-    map = models.ForeignKey(
-        'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
 
     class Meta:
         db_table = 'rcs_group'
@@ -126,8 +116,6 @@ class PathModel(models.Model):
     maxReverseVelocity = models.FloatField(
         default=1.0, db_column='maxReverseVelocity')
     locked = models.BooleanField(default=False)
-    group = models.ForeignKey(
-        'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId')
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
 
@@ -149,7 +137,7 @@ class VehicleModel(models.Model):
     position = models.JSONField(default=dict)
     nextPosition = models.JSONField(default=dict, db_column='nextPosition')
     group = models.ForeignKey(
-        'core.GroupModel', on_delete=models.CASCADE, null=True, db_column='groupId', blank=True)
+        'core.VehicleGroupModel', on_delete=models.CASCADE, null=True, db_column='groupId', blank=True)
     # map = models.ForeignKey(
     #     'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
     image = models.FileField(upload_to=vehicle_dir_name, blank=True)

@@ -19,11 +19,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
+
 from rcs.simulator.views import Simulator
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,5 +36,4 @@ urlpatterns = [
 ]
 
 sim = Simulator('Robot-1')
-sim.setDaemon(True)
-sim.start()
+sim.enable()
