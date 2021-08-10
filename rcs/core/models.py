@@ -100,9 +100,11 @@ class AreaTypeModel(models.Model):
 
 class VehicleGroupModel(models.Model):
     name = models.CharField(max_length=64)
+    avatar = models.URLField(null=True)
+    action = models.CharField(null=True, max_length=64)
 
     class Meta:
-        db_table = 'rcs_group'
+        db_table = 'rcs_vehicle_group'
 
 
 class PathModel(models.Model):
@@ -135,25 +137,14 @@ class VehicleModel(models.Model):
     name = models.CharField(max_length=64)
     state = models.IntegerField(choices=VEHICLE_STATE, default=0)
     position = models.JSONField(default=dict)
-    nextPosition = models.JSONField(default=dict, db_column='nextPosition')
     group = models.ForeignKey(
-        'core.VehicleGroupModel', on_delete=models.CASCADE, null=True, db_column='groupId', blank=True)
-    # map = models.ForeignKey(
-    #     'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
+        'core.VehicleGroupModel', on_delete=models.CASCADE, null=True, db_column='groupId', blank=True, default=1)
     image = models.FileField(upload_to=vehicle_dir_name, blank=True)
-    power = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'rcs_vehicle'
         verbose_name = 'Vehicle'
-
-
-class VehicleTypeModel(models.Model):
-    name = models.CharField(max_length=64)
-
-    class Meta:
-        db_table = 'rcs_vehicle_type'
 
 
 class VehicleSettingModel(models.Model):

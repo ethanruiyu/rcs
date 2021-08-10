@@ -100,5 +100,14 @@
       "value": 4,
       "description": "Whether to automatically create recharge orders for idle vehicles."
     }
+  },
+    {
+    "model": "core.VehicleGroupModel",
+    "pk": 1,
+    "fields": {
+      "name": "Default",
+      "avatar": "http://localhost:8000/media/vehicles/Robot-1/1.png",
+      "action": "null"
+    }
   }
 ]
