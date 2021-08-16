@@ -104,6 +104,11 @@ class VehicleSettingViewSet(ModelViewSet):
     queryset = VehicleSettingModel.objects.all()
 
 
+class VehicleGroupViewSet(ModelViewSet):
+    serializer_class = VehicleGroupSerializer
+    queryset = VehicleGroupModel.objects.all()
+
+
 class GlobalSettingViewSet(ModelViewSet):
     serializer_class = GlobalSettingSerializer
     queryset = GlobalSettingModel.objects.all()

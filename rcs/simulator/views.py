@@ -18,6 +18,7 @@ class Simulator:
         self._scheduler = BackgroundScheduler()
         self._scheduler.add_job(self.pub_heartbeat, 'interval', seconds=1)
         self._client = Client(name, clean_session=True)
+        self._client.on_connect = lambda client, userdata, flags, rc: self._logger.info(rc)
         self._client.reconnect_delay_set(1, 10)
 
     def enable(self):

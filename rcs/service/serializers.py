@@ -70,9 +70,33 @@ class VehicleSerializer(serializers.ModelSerializer):
     """
     Vehicle model serializer
     """
+    avatar = serializers.SerializerMethodField(read_only=True)
+
+    def get_avatar(self, obj):
+        if VehicleGroupModel.objects.filter(name=obj.group.name).exists():
+            return VehicleGroupModel.objects.get(name=obj.group.name).avatar
+        else:
+            return ''
 
     class Meta:
         model = VehicleModel
+        fields = '__all__'
+
+
+class VehicleGroupSerializer(serializers.ModelSerializer):
+    """
+    Vehicle Group model serializer
+    """
+    online_count = serializers.SerializerMethodField()
+
+    def get_online_count(self, obj):
+        total_count = VehicleModel.objects.filter(group_id=obj.id).count()
+        online_vehicle_count = VehicleModel.objects.filter(group_id=obj.id).exclude(state__in=[0, 4]).count()
+
+        return online_vehicle_count / total_count * 100
+
+    class Meta:
+        model = VehicleGroupModel
         fields = '__all__'
 
 

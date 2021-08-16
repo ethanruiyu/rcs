@@ -22,6 +22,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 
 from rcs.simulator.views import Simulator
+from rcs.adapter.adapter import MasterMqttAdapter
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,3 +38,6 @@ urlpatterns = [
 
 sim = Simulator('Robot-1')
 sim.enable()
+
+master = MasterMqttAdapter()
+master.enable()
