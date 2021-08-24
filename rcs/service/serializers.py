@@ -71,32 +71,36 @@ class VehicleSerializer(serializers.ModelSerializer):
     Vehicle model serializer
     """
     avatar = serializers.SerializerMethodField(read_only=True)
+    state = serializers.SerializerMethodField(read_only=True)
 
     def get_avatar(self, obj):
-        if VehicleGroupModel.objects.filter(name=obj.group.name).exists():
-            return VehicleGroupModel.objects.get(name=obj.group.name).avatar
+        if VehicleTypeModel.objects.filter(name=obj.group.name).exists():
+            return VehicleTypeModel.objects.get(name=obj.group.name).avatar
         else:
             return ''
+
+    def get_state(self, obj):
+        return obj.get_state_display()
 
     class Meta:
         model = VehicleModel
         fields = '__all__'
 
 
-class VehicleGroupSerializer(serializers.ModelSerializer):
+class VehicleTypeSerializer(serializers.ModelSerializer):
     """
-    Vehicle Group model serializer
+    Vehicle Type model serializer
     """
     online_count = serializers.SerializerMethodField()
 
     def get_online_count(self, obj):
-        total_count = VehicleModel.objects.filter(group_id=obj.id).count()
-        online_vehicle_count = VehicleModel.objects.filter(group_id=obj.id).exclude(state__in=[0, 4]).count()
+        total_count = VehicleModel.objects.filter(type_id=obj.id).count()
+        online_vehicle_count = VehicleModel.objects.filter(type_id=obj.id).exclude(state__in=[0, 4]).count()
 
-        return online_vehicle_count / total_count * 100
+        return total_count if total_count == 0 else online_vehicle_count / total_count * 100
 
     class Meta:
-        model = VehicleGroupModel
+        model = VehicleTypeModel
         fields = '__all__'
 
 
@@ -110,11 +114,11 @@ class VehicleSettingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class GlobalSettingSerializer(serializers.ModelSerializer):
+class SystemSettingSerializer(serializers.ModelSerializer):
     """
     Global Setting model serializer
     """
 
     class Meta:
-        model = GlobalSettingModel
+        model = SystemSettingModel
         fields = '__all__'

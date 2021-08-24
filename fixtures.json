@@ -66,43 +66,70 @@
     }
   },
   {
-    "model": "core.GlobalSettingModel",
+    "model": "core.SystemSettingModel",
     "pk": 1,
     "fields": {
-      "key": "MISSION_PRIORITIES",
-      "value": 1,
+      "key": "MissionPriorities",
+      "value": "BY_AGE",
       "description": "Keys by which to prioritize transport orders for assignment.\nPossible values:\nBY_AGE: Sort by age, oldest first.\nBY_DEADLINE: Sort by deadline, most urgent first.\nDEADLINE_AT_RISK_FIRST: Sort orders with deadlines at risk first.\nBY_NAME: Sort by name, lexicographically."
     }
   },
   {
-    "model": "core.GlobalSettingModel",
+    "model": "core.SystemSettingModel",
     "pk": 2,
     "fields": {
       "key": "VEHICLE_PRIORITIES",
-      "value": 2,
+      "value": "IDLE_FIRST",
       "description": "Keys by which to prioritize vehicle candidates for assignment.\nPossible values:\nBY_ENERGY_LEVEL: Sort by energy level of the vehicle, highest first.\nIDLE_FIRST: Sort vehicles with state IDLE first.\nBY_COMPLETE_ROUTING_COSTS: Sort by complete routing costs, lowest first.\nBY_INITIAL_ROUTING_COSTS: Sort by routing costs for the first destination.\nBY_VEHICLE_NAME: Sort by vehicle name, lexicographically."
     }
   },
   {
-    "model": "core.GlobalSettingModel",
+    "model": "core.SystemSettingModel",
     "pk": 3,
     "fields": {
-      "key": "PARK_IDLE_VEHICLES",
-      "value": 3,
-      "description": "Whether to automatically create parking orders for idle vehicles."
+      "key": "AutoParking",
+      "value": false,
+      "description": "Whether to automatically create parking missions for idle vehicles."
     }
   },
   {
-    "model": "core.GlobalSettingModel",
+    "model": "core.SystemSettingModel",
     "pk": 4,
     "fields": {
-      "key": "RECHARGE_IDLE_VEHICLES",
-      "value": 4,
-      "description": "Whether to automatically create recharge orders for idle vehicles."
+      "key": "AutoCharging",
+      "value": false,
+      "description": "Whether to automatically create recharge mission for idle vehicles."
     }
   },
-    {
-    "model": "core.VehicleGroupModel",
+  {
+    "model": "core.SystemSettingModel",
+    "pk": 5,
+    "fields": {
+      "key": "IdleTime",
+      "value": 30,
+      "description": "Minimum of minutes a robot is allowed to idle, before it is sent to park point."
+    }
+  },
+  {
+    "model": "core.SystemSettingModel",
+    "pk": 6,
+    "fields": {
+      "key": "EnergyLevelSufficiently",
+      "value": 80,
+      "description": "The value at/above which the vehicle's energy level is considered\nsufficiently recharged.."
+    }
+  },
+  {
+    "model": "core.SystemSettingModel",
+    "pk": 7,
+    "fields": {
+      "key": "EnergyLevelCritical",
+      "value": 20,
+      "description": "The value at/below which the vehicle's energy level is considered\n'critical'."
+    }
+  },
+  {
+    "model": "core.VehicleTypeModel",
     "pk": 1,
     "fields": {
       "name": "Default",

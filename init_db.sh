@@ -7,6 +7,6 @@ rm -rf rcs/adapter/migrations
 
 python manage.py makemigrations account core
 python manage.py migrate
-python manage.py loaddata rcs/core/fixtures/core.json
+python manage.py loaddata fixtures.json
 python manage.py createsuperuser --noinput --username=rcs
 

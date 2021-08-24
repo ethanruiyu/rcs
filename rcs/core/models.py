@@ -20,6 +20,14 @@ def vehicle_dir_name(instance, filename):
     return 'vehicles/{0}/{1}'.format(instance.name, filename)
 
 
+class SiteModel(models.Model):
+    name = models.CharField(max_length=64)
+    description = models.TextField(null=True)
+
+    class Meta:
+        db_table = 'rcs_site'
+
+
 class MapModel(models.Model):
     name = models.CharField(max_length=64)
     description = models.TextField(null=True)
@@ -30,6 +38,7 @@ class MapModel(models.Model):
     config = models.JSONField(default=dict)
     active = models.BooleanField(default=False)
     file = models.FileField(upload_to=map_dir_name, blank=True)
+    site = models.ForeignKey('core.SiteModel', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'rcs_map'
@@ -98,13 +107,13 @@ class AreaTypeModel(models.Model):
         db_table = 'rcs_area_type'
 
 
-class VehicleGroupModel(models.Model):
+class VehicleTypeModel(models.Model):
     name = models.CharField(max_length=64)
     avatar = models.URLField(null=True)
     action = models.CharField(null=True, max_length=64)
 
     class Meta:
-        db_table = 'rcs_vehicle_group'
+        db_table = 'rcs_vehicle_type'
 
 
 class PathModel(models.Model):
@@ -127,20 +136,21 @@ class PathModel(models.Model):
 
 class VehicleModel(models.Model):
     VEHICLE_STATE = (
-        (0, 'offline'),
-        (1, 'idle'),
-        (2, 'busy'),
-        (3, 'pause'),
-        (4, 'error'),
-        (5, 'charging')
+        (0, 'OFFLINE'),
+        (1, 'IDLE'),
+        (2, 'BUSY'),
+        (3, 'PAUSE'),
+        (4, 'ERROR'),
+        (5, 'CHARGING')
     )
     name = models.CharField(max_length=64)
     state = models.IntegerField(choices=VEHICLE_STATE, default=0)
     position = models.JSONField(default=dict)
-    group = models.ForeignKey(
-        'core.VehicleGroupModel', on_delete=models.CASCADE, null=True, db_column='groupId', blank=True, default=1)
+    type = models.ForeignKey(
+        'core.VehicleTypeModel', on_delete=models.CASCADE, null=True, blank=True, default=1, db_column='typeId')
     image = models.FileField(upload_to=vehicle_dir_name, blank=True)
     active = models.BooleanField(default=True)
+    site = models.ForeignKey('core.SiteModel', on_delete=models.CASCADE, db_column='siteId')
 
     class Meta:
         db_table = 'rcs_vehicle'
@@ -162,7 +172,7 @@ class VehicleSettingModel(models.Model):
         verbose_name = 'Vehicle Setting'
 
 
-class GlobalSettingModel(models.Model):
+class SystemSettingModel(models.Model):
     key = models.CharField(max_length=64)
     value = models.CharField(max_length=64)
     description = models.TextField(null=True)
@@ -171,8 +181,8 @@ class GlobalSettingModel(models.Model):
         return self.key
 
     class Meta:
-        db_table = 'rcs_global_setting'
-        verbose_name = 'Global Setting'
+        db_table = 'rcs_system_setting'
+        verbose_name = 'System Setting'
 
 
 @receiver(models.signals.post_delete, sender=MapModel)

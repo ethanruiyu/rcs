@@ -104,11 +104,21 @@ class VehicleSettingViewSet(ModelViewSet):
     queryset = VehicleSettingModel.objects.all()
 
 
-class VehicleGroupViewSet(ModelViewSet):
-    serializer_class = VehicleGroupSerializer
-    queryset = VehicleGroupModel.objects.all()
+class VehicleTypeViewSet(ModelViewSet):
+    serializer_class = VehicleTypeSerializer
+    queryset = VehicleTypeModel.objects.all()
 
 
-class GlobalSettingViewSet(ModelViewSet):
-    serializer_class = GlobalSettingSerializer
-    queryset = GlobalSettingModel.objects.all()
+class SystemSettingViewSet(ModelViewSet):
+    serializer_class = SystemSettingSerializer
+    queryset = SystemSettingModel.objects.all()
+
+    def settings_update(self, request, *args, **kwargs):
+        data = request.data
+
+        for i in data.keys():
+            obj = SystemSettingModel.objects.filter(key=i).first()
+            obj.value = data[i]
+            obj.save()
+
+        return Response(status=200)

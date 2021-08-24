@@ -7,15 +7,17 @@ service_router.register(basename='', prefix='map', viewset=MapViewSet)
 service_router.register(basename='', prefix='point', viewset=PointViewSet)
 service_router.register(basename='', prefix='area', viewset=AreaViewSet)
 service_router.register(basename='', prefix='block', viewset=BlockViewSet)
-service_router.register(basename='', prefix='vehicle', viewset=VehicleViewSet)
-service_router.register(basename='', prefix='vehicle-group', viewset=VehicleGroupViewSet)
-service_router.register(basename='', prefix='vehicle-setting', viewset=VehicleSettingViewSet)
 service_router.register(basename='', prefix='path', viewset=PathViewSet)
-service_router.register(basename='', prefix='global-setting', viewset=GlobalSettingViewSet)
+
+service_router.register(basename='', prefix='vehicle', viewset=VehicleViewSet)
+service_router.register(basename='', prefix='vehicle-type', viewset=VehicleTypeViewSet)
+service_router.register(basename='', prefix='vehicle-setting', viewset=VehicleSettingViewSet)
+
+service_router.register(basename='', prefix='system-setting', viewset=SystemSettingViewSet)
 
 
 urlpatterns = [
-    # path('test/multi_delete/', MapViewSet.as_view({'delete': 'multi_delete'}))
+    path('system-setting/update/', SystemSettingViewSet.as_view({'put': 'settings_update'}))
 ]
 
 urlpatterns += service_router.urls
