@@ -24,13 +24,17 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from rcs.simulator.views import Simulator
 from rcs.adapter.adapter import MasterMqttAdapter
 
+from rcs.account.views import *
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('rcs.service.urls')),
+    path('api/account/', include('rcs.account.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', RCSTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     url(r'media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT, 'show_indexes': True}),

@@ -14,12 +14,12 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.is_superuser = is_superuser
         user.save()
+        UserProfile.objects.create(user=user)
 
         return user
 
     def create_superuser(self, username, password):
         super_user = self.create_user(username=username, password=settings.DJANGO_SUPERUSER_PASSWORD, is_superuser=True)
-
         return super_user
 
 
@@ -41,6 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
     real_name = models.CharField(max_length=64, null=True)
+    dashboard_layout = models.JSONField(default=dict)
     settings = models.JSONField(default=dict)
     department = models.CharField(max_length=64, null=True)
 
