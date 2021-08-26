@@ -17,7 +17,9 @@ service_router.register(basename='', prefix='system-setting', viewset=SystemSett
 
 
 urlpatterns = [
-    path('system-setting/update/', SystemSettingViewSet.as_view({'put': 'settings_update'}))
+    path('system-setting/update/', SystemSettingViewSet.as_view({'put': 'settings_update'})),
+
+    # path('vehicle/online-info/', VehicleViewSet.as_view({'get': 'online_info'}))
 ]
 
 urlpatterns += service_router.urls

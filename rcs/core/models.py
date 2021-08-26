@@ -38,7 +38,7 @@ class MapModel(models.Model):
     config = models.JSONField(default=dict)
     active = models.BooleanField(default=False)
     file = models.FileField(upload_to=map_dir_name, blank=True)
-    site = models.ForeignKey('core.SiteModel', on_delete=models.CASCADE)
+    # site = models.ForeignKey('core.SiteModel', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'rcs_map'
@@ -150,7 +150,8 @@ class VehicleModel(models.Model):
         'core.VehicleTypeModel', on_delete=models.CASCADE, null=True, blank=True, default=1, db_column='typeId')
     image = models.FileField(upload_to=vehicle_dir_name, blank=True)
     active = models.BooleanField(default=True)
-    site = models.ForeignKey('core.SiteModel', on_delete=models.CASCADE, db_column='siteId')
+    # site = models.ForeignKey('core.SiteModel', on_delete=models.CASCADE, db_column='siteId')
+    ip = models.GenericIPAddressField(null=True)
 
     class Meta:
         db_table = 'rcs_vehicle'
@@ -173,7 +174,7 @@ class VehicleSettingModel(models.Model):
 
 
 class SystemSettingModel(models.Model):
-    key = models.CharField(max_length=64)
+    key = models.CharField(max_length=64, unique=True)
     value = models.CharField(max_length=64)
     description = models.TextField(null=True)
 

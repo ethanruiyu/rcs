@@ -74,8 +74,8 @@ class VehicleSerializer(serializers.ModelSerializer):
     state = serializers.SerializerMethodField(read_only=True)
 
     def get_avatar(self, obj):
-        if VehicleTypeModel.objects.filter(name=obj.group.name).exists():
-            return VehicleTypeModel.objects.get(name=obj.group.name).avatar
+        if VehicleTypeModel.objects.filter(name=obj.type.name).exists():
+            return VehicleTypeModel.objects.get(name=obj.type.name).avatar
         else:
             return ''
 
@@ -91,13 +91,6 @@ class VehicleTypeSerializer(serializers.ModelSerializer):
     """
     Vehicle Type model serializer
     """
-    online_count = serializers.SerializerMethodField()
-
-    def get_online_count(self, obj):
-        total_count = VehicleModel.objects.filter(type_id=obj.id).count()
-        online_vehicle_count = VehicleModel.objects.filter(type_id=obj.id).exclude(state__in=[0, 4]).count()
-
-        return total_count if total_count == 0 else online_vehicle_count / total_count * 100
 
     class Meta:
         model = VehicleTypeModel

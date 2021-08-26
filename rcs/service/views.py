@@ -11,6 +11,14 @@ from .serializers import *
 from .filters import *
 from django_filters import rest_framework
 
+DEFAULT_VEHICLE_SETTINGS = [
+    {
+        'key': 'Diameter',
+        'value': 1,
+        'description': 'vehicle max diameter'
+    }
+]
+
 
 class MapViewSet(ModelViewSet):
     serializer_class = MapSerializer
@@ -93,10 +101,26 @@ class VehicleViewSet(ModelViewSet):
     def register(self, request, *args, **kwargs):
         vehicle_name = request.data.get('name', None)
         if vehicle_name is not None and not VehicleModel.objects.filter(name=vehicle_name).exists():
-            VehicleModel.objects.create(name=vehicle_name)
+            obj = VehicleModel.objects.create(name=vehicle_name)
+            # init vehicle default settings when vehicle registering
+            for i in DEFAULT_VEHICLE_SETTINGS:
+                VehicleSettingModel.objects.create(key=i['key'], value=i['value'], description=i['description'],
+                                                   vehicle=obj)
             scan_vehicles.remove(vehicle_name)
 
         return Response(data='')
+
+    @action(methods=['get'], detail=False)
+    def online_info(self, request, *args, **kwargs):
+        total = VehicleModel.objects.all().count()
+        offline = VehicleModel.objects.filter(state__in=[0, 4]).count()
+        online = total - offline
+        data = {
+            'total': total,
+            'offline': offline,
+            'online': online
+        }
+        return Response(data=data, status=200)
 
 
 class VehicleSettingViewSet(ModelViewSet):

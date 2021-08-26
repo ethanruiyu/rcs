@@ -21,51 +21,6 @@
     }
   },
   {
-    "model": "core.VehicleSettingModel",
-    "pk": 1,
-    "fields": {
-      "key": "SIZE",
-      "value": 0,
-      "description": "vehicle length"
-    }
-  },
-  {
-    "model": "core.VehicleSettingModel",
-    "pk": 2,
-    "fields": {
-      "key": "ENERGY_LEVEL_CRITICAL",
-      "value": 30,
-      "description": "The value at/below which the vehicle's energy level is considered \"critical\"."
-    }
-  },
-  {
-    "model": "core.VehicleSettingModel",
-    "pk": 3,
-    "fields": {
-      "key": "ENERGY_LEVEL_SUFFICIENTLY",
-      "value": 80,
-      "description": "The value at/above which the vehicle's energy level is considered sufficiently recharged."
-    }
-  },
-  {
-    "model": "core.VehicleSettingModel",
-    "pk": 4,
-    "fields": {
-      "key": "MAX_VELOCITY",
-      "value": 1,
-      "description": "This vehicle's maximum velocity (in mm/s)."
-    }
-  },
-  {
-    "model": "core.VehicleSettingModel",
-    "pk": 5,
-    "fields": {
-      "key": "MAX_REVERSE_VELOCITY",
-      "value": 1,
-      "description": "This vehicle's maximum reverse velocity (in mm/s)."
-    }
-  },
-  {
     "model": "core.SystemSettingModel",
     "pk": 1,
     "fields": {
