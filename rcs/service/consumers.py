@@ -1,3 +1,5 @@
+import json
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
@@ -7,7 +9,9 @@ class RCSConsumer(AsyncWebsocketConsumer):
         self.group_name = ''
 
     async def connect(self):
-        self.group_name = self.scope['url_route']['kwargs']
+        self.group_name = self.scope['url_route']['kwargs']['name']
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(
@@ -17,3 +21,7 @@ class RCSConsumer(AsyncWebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         pass
+
+    async def location(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({'location': message}))

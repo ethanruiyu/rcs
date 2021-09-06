@@ -19,6 +19,7 @@ class MasterMqttAdapter:
             self._client.loop_start()
             self._client.subscribe('/vehicle/#')
             self._client.message_callback_add('/vehicle/+/heartbeat', self.on_heartbeat)
+            self._client.message_callback_add('/vehicle/report/navigation/location', self.on_location)
         except MQTTException as e:
             self._logger.error(e.__context__)
 
@@ -41,3 +42,7 @@ class MasterMqttAdapter:
         else:
             if vehicle_name not in scan_vehicles:
                 scan_vehicles.append(vehicle_name)
+
+    def on_location(self, client, obj, msg):
+        # print(msg.payload)
+        pass
