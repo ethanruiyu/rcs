@@ -72,6 +72,8 @@ class VehicleSerializer(serializers.ModelSerializer):
     """
     avatar = serializers.SerializerMethodField(read_only=True)
     state = serializers.SerializerMethodField(read_only=True)
+    image = serializers.URLField(read_only=True)
+    type = serializers.SerializerMethodField(read_only=True)
 
     def get_avatar(self, obj):
         if VehicleTypeModel.objects.filter(name=obj.type.name).exists():
@@ -81,6 +83,9 @@ class VehicleSerializer(serializers.ModelSerializer):
 
     def get_state(self, obj):
         return obj.get_state_display()
+
+    def get_type(self, obj):
+        return obj.type.name
 
     class Meta:
         model = VehicleModel

@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rcs.core',
     'rcs.simulator',
     'drf_spectacular',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'channels'
 ]
 
 REST_FRAMEWORK = {
@@ -191,4 +192,15 @@ SPECTACULAR_SETTINGS = {
                    '- Create, Query and Withdraw mission\n',
     'VERSION': '1.0.0',
     # OTHER SETTINGS
+}
+
+ASGI_APPLICATION = 'rcs.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        }
+    }
 }

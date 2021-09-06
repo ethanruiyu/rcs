@@ -92,6 +92,8 @@ class PathViewSet(ModelViewSet):
 class VehicleViewSet(ModelViewSet):
     serializer_class = VehicleSerializer
     queryset = VehicleModel.objects.all()
+    filter_class = VehicleFilter
+    filter_backends = [rest_framework.DjangoFilterBackend]
 
     @action(methods=['get'], detail=False)
     def scan(self, request, *args, **kwargs):
