@@ -10,6 +10,7 @@ from .paginations import *
 from .serializers import *
 from .filters import *
 from django_filters import rest_framework
+import yaml
 
 DEFAULT_VEHICLE_SETTINGS = [
     {
@@ -44,11 +45,17 @@ class MapViewSet(ModelViewSet):
         im = Image.open('media/maps/{0}/map.png'.format(name))
         width, height = im.size
 
+        yaml_file = open('media/maps/{0}/map.yaml'.format(name), 'r', encoding='utf-8')
+        content = yaml_file.read()
+        yaml_file.close()
+        config = yaml.load(content)
         if self.queryset.filter(name=name).exists():
             obj = self.queryset.get(name=name)
             obj.config = {
                 'width': width,
-                'height': height
+                'height': height,
+                'origin': config['origin'],
+                'resolution': config['resolution']
             }
             obj.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
