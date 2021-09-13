@@ -4,6 +4,7 @@ import shutil
 from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
+from rcs.common.enum import *
 
 
 def map_dir_name(instance, filename):
@@ -151,11 +152,44 @@ class VehicleModel(models.Model):
     image = models.FileField(upload_to=vehicle_dir_name, blank=True)
     active = models.BooleanField(default=True)
     # site = models.ForeignKey('core.SiteModel', on_delete=models.CASCADE, db_column='siteId')
+    battery = models.IntegerField(default=0)
     ip = models.GenericIPAddressField(null=True)
 
     class Meta:
         db_table = 'rcs_vehicle'
         verbose_name = 'Vehicle'
+
+
+class MissionModel(models.Model):
+    MISSION_STATE = (
+        (0, 'RAW'),
+        (1, 'DISPATCH'),
+        (2, 'PROCESSED'),
+        (3, 'FINISHED'),
+        (4, 'PAUSED'),
+        (5, 'ABORT')
+    )
+    sn = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, null=True, blank=True)
+    state = models.IntegerField(choices=MISSION_STATE, default=0)
+    create_time = models.DateTimeField(auto_now_add=True)
+    begin_time = models.DateTimeField(null=True)
+    finish_time = models.DateTimeField(null=True)
+    reason = models.TextField(null=True)
+    track = models.JSONField(default=list)
+    plan = models.JSONField(default=list)
+    vehicle = models.ForeignKey('core.VehicleModel', on_delete=models.CASCADE, null=True)
+    isTemplate = models.BooleanField(default=False, db_column='isTemplate')
+
+    class Meta:
+        db_table = 'rcs_mission'
+
+
+class MissionGroup(models.Model):
+    name = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = 'rcs_mission_group'
 
 
 class VehicleSettingModel(models.Model):

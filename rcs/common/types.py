@@ -1,10 +1,13 @@
 from rcs.core.models import MapModel
+from django.db import connection
 
 
 class Types:
     def __init__(self):
-        self.config = MapModel.objects.filter(active=True).first().config if MapModel.objects.filter(
-            active=True).exists() else None
+        cursor = connection.cursor()
+        if 'rcs_map' in connection.introspection.get_table_list(cursor):
+            self.config = MapModel.objects.filter(active=True).first().config if MapModel.objects.filter(
+                active=True).exists() else None
 
 
 class Point(Types):
