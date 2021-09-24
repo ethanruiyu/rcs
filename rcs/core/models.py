@@ -51,6 +51,7 @@ class MapModel(models.Model):
                 if self != temp:
                     temp.active = False
                     temp.save()
+                    settings.ACTIVE_MAP_CONFIG = temp.config
             except MapModel.DoesNotExist:
                 pass
 

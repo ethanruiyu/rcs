@@ -1,21 +1,10 @@
 from rcs.core.models import MapModel
 from django.db import connection
 import math
+from django.conf import settings
 
 
-class Types:
-    def __init__(self):
-        # cursor = connection.cursor()
-        # table_list = connection.introspection.get_table_list(cursor)
-        # names = []
-        # for i in table_list:
-        #     names.append(i.name)
-        # if 'rcs_map' in names:
-        self.config = MapModel.objects.filter(active=True).first().config if MapModel.objects.filter(
-            active=True).exists() else None
-
-
-class Point(Types):
+class Point:
     x: float = 0
     y: float = 0
     z: float = 0
@@ -30,11 +19,11 @@ class Point(Types):
         """
         navigation coordinates to visualization coordinates
         """
-        ipx = int((self.x - self.config['origin'][0]) / self.config['resolution'])
-        ipy = int(self.config['height'] - (self.y - self.config['origin'][1]) / self.config['resolution'] - 1)
+        ipx = int((self.x - settings.ACTIVE_MAP_CONFIG['origin'][0]) / settings.ACTIVE_MAP_CONFIG['resolution'])
+        ipy = int(settings.ACTIVE_MAP_CONFIG['height'] - (self.y - settings.ACTIVE_MAP_CONFIG['origin'][1]) / settings.ACTIVE_MAP_CONFIG['resolution'] - 1)
 
-        vpx = ipx - self.config['width'] / 2
-        vpy = ipy - self.config['height'] / 2
+        vpx = ipx - settings.ACTIVE_MAP_CONFIG['width'] / 2
+        vpy = ipy - settings.ACTIVE_MAP_CONFIG['height'] / 2
 
         return [vpx, vpy, 0]
 
@@ -42,7 +31,7 @@ class Point(Types):
         """
         visualization coordinates to navigation coordinates
         """
-        if self.config:
+        if settings.ACTIVE_MAP_CONFIG:
             pass
         else:
             return None
@@ -58,7 +47,7 @@ class Point(Types):
         }
 
 
-class Angle(Types):
+class Angle:
     angle: float = 0
 
     def __init__(self, **kwargs):
@@ -69,7 +58,7 @@ class Angle(Types):
         return self.angle
 
 
-class Quaternion(Types):
+class Quaternion:
     x: float = 0
     y: float = 0
     z: float = 0
@@ -110,7 +99,7 @@ class Quaternion(Types):
         }
 
 
-class Pose(Types):
+class Pose:
     position: Point = Point([0, 0, 0])
     orientation: Quaternion = Quaternion([0, 0, 0, 0])
 

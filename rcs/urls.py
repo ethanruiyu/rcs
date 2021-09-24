@@ -13,19 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
-
-from rcs.simulator.views import Simulator
-from rcs.adapter.adapter import MasterMqttAdapter
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from rcs.account.views import *
-
+from rcs.adapter.adapter import MasterMqttAdapter
+from rcs.core.models import MapModel
+from rcs.simulator.views import Simulator
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -45,3 +43,6 @@ sim.enable()
 
 master = MasterMqttAdapter()
 master.enable()
+
+if MapModel.objects.filter(active=True).exists():
+    settings.ACTIVE_MAP_CONFIG = MapModel.objects.filter(active=True).first().config
