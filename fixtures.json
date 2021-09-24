@@ -1,26 +1,5 @@
 [
   {
-    "model": "core.PointTypeModel",
-    "pk": 1,
-    "fields": {
-      "name": "ROUTE_POINT"
-    }
-  },
-  {
-    "model": "core.PointTypeModel",
-    "pk": 2,
-    "fields": {
-      "name": "PARK_POINT"
-    }
-  },
-  {
-    "model": "core.PointTypeModel",
-    "pk": 3,
-    "fields": {
-      "name": "CHARGE_POINT"
-    }
-  },
-  {
     "model": "core.SystemSettingModel",
     "pk": 1,
     "fields": {

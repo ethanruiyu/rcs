@@ -60,6 +60,40 @@ class MapViewSet(ModelViewSet):
             obj.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        PointModel.objects.all().delete()
+        AreaModel.objects.all().delete()
+        BlockModel.objects.all().delete()
+        print(instance.raw)
+        for item in instance.raw:
+            if item['type'] == 'Route':
+                PointModel.objects.create(position={'x': item['x'], 'y': item['y']}, name=item['id'], type='Route',
+                                          map=instance)
+            if item['type'] == 'Charge':
+                PointModel.objects.create(position={'x': item['x'], 'y': item['y']}, name=item['id'], type='Charge',
+                                          map=instance)
+            if item['type'] == 'Park':
+                PointModel.objects.create(position={'x': item['x'], 'y': item['y']}, name=item['id'], type='Parking',
+                                          map=instance)
+            if item['type'] == 'Area':
+                AreaModel.objects.create(map=instance, name=item['id'], vertices=str(item['points']))
+
+            if item['type'] == 'Block':
+                BlockModel.objects.create(map=instance, name=item['id'], vertices=str(item['points']))
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
     @action(methods=['delete'], detail=False)
     def multi_delete(self, request, *args, **kwargs):
         delete_id = request.query_params.get('deleteid', None)
@@ -76,9 +110,9 @@ class PointViewSet(ModelViewSet):
     queryset = PointModel.objects.all()
 
 
-class PointTypeViewSet(ModelViewSet):
-    serializer_class = PointTypeSerializer
-    queryset = PointTypeModel.objects.all()
+# class PointTypeViewSet(ModelViewSet):
+#     serializer_class = PointTypeSerializer
+#     queryset = PointTypeModel.objects.all()
 
 
 class AreaViewSet(ModelViewSet):

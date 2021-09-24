@@ -26,15 +26,15 @@ class PointSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PointTypeSerializer(serializers.ModelSerializer):
-    """
-    Point Type model serializer
-    """
-
-    class Meta:
-        model = PointTypeModel
-        fields = '__all__'
-
+# class PointTypeSerializer(serializers.ModelSerializer):
+#     """
+#     Point Type model serializer
+#     """
+#
+#     class Meta:
+#         model = PointTypeModel
+#         fields = '__all__'
+#
 
 class BlockSerializer(serializers.ModelSerializer):
     """

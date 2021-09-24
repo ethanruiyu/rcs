@@ -57,26 +57,30 @@ class MapModel(models.Model):
         super(MapModel, self).save(*args, **kwargs)
 
 
-class PointTypeModel(models.Model):
-    name = models.CharField(max_length=64)
-    description = models.TextField(null=True)
-
-    class Meta:
-        db_table = 'rcs_point_type'
-
-    def __str__(self):
-        return self.name
+# class PointTypeModel(models.Model):
+#     name = models.CharField(max_length=64)
+#     description = models.TextField(null=True)
+#
+#     class Meta:
+#         db_table = 'rcs_point_type'
+#
+#     def __str__(self):
+#         return self.name
 
 
 class PointModel(models.Model):
+    POINT_TYPE = (
+        ('Route', 'route point'),
+        ('Charge', 'charge point'),
+        ('Parking', 'parking point')
+    )
     name = models.CharField(max_length=64)
-    type = models.ForeignKey('core.PointTypeModel', on_delete=models.CASCADE, null=True)
+    type = models.CharField(choices=POINT_TYPE, max_length=64, null=True)
     position = models.JSONField(default=dict)
     orientation = models.JSONField(default=dict)
     active = models.BooleanField(default=True)
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
-    disabled = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'rcs_point'
@@ -84,6 +88,8 @@ class PointModel(models.Model):
 
 class BlockModel(models.Model):
     name = models.CharField(max_length=64)
+    vertices = models.TextField(null=True)
+    active = models.BooleanField(default=True)
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
 
@@ -93,6 +99,8 @@ class BlockModel(models.Model):
 
 class AreaModel(models.Model):
     name = models.CharField(max_length=64)
+    vertices = models.TextField(null=True)
+    active = models.BooleanField(default=True)
     map = models.ForeignKey(
         'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
 
