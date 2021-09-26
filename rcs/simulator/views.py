@@ -36,4 +36,4 @@ class Simulator:
             self._logger.error(e.__str__())
 
     def pub_heartbeat(self):
-        self._client.publish('/vehicle/{0}/heartbeat'.format(self._name), json.dumps({'time': '111'}))
+        self._client.publish('/root/{0}/heartbeat'.format(self._name), json.dumps({'time': '111'}))

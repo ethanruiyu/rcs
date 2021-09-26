@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
-from rcs.adapter.adapter import scan_vehicles
+from rcs.adapter.adapter import SCAN_VEHICLES
 from .paginations import *
 from .serializers import *
 from .filters import *
@@ -138,7 +138,7 @@ class VehicleViewSet(ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def scan(self, request, *args, **kwargs):
-        return Response(data=scan_vehicles)
+        return Response(data=SCAN_VEHICLES)
 
     @action(methods=['post'], detail=False)
     def register(self, request, *args, **kwargs):
@@ -149,7 +149,7 @@ class VehicleViewSet(ModelViewSet):
             for i in DEFAULT_VEHICLE_SETTINGS:
                 VehicleSettingModel.objects.create(key=i['key'], value=i['value'], description=i['description'],
                                                    vehicle=obj)
-            scan_vehicles.remove(vehicle_name)
+            SCAN_VEHICLES.remove(vehicle_name)
 
         return Response(data='')
 
