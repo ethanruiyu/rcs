@@ -146,15 +146,15 @@ class PathModel(models.Model):
 
 class VehicleModel(models.Model):
     VEHICLE_STATE = (
-        (0, 'OFFLINE'),
-        (1, 'IDLE'),
-        (2, 'BUSY'),
-        (3, 'PAUSE'),
-        (4, 'ERROR'),
-        (5, 'CHARGING')
+        ('offline', 'OFFLINE'),
+        ('idle', 'IDLE'),
+        ('busy', 'BUSY'),
+        ('pause', 'PAUSE'),
+        ('error', 'ERROR'),
+        ('charging', 'CHARGING')
     )
     name = models.CharField(max_length=64)
-    state = models.IntegerField(choices=VEHICLE_STATE, default=0)
+    state = models.CharField(choices=VEHICLE_STATE, default='offline', max_length=32)
     position = models.JSONField(default=dict)
     type = models.ForeignKey(
         'core.VehicleTypeModel', on_delete=models.CASCADE, null=True, blank=True, default=1, db_column='typeId')
