@@ -1,6 +1,6 @@
 .. _mqtt:
 
-MQTT
+MQTT API
 =======
 
 结构图：
@@ -265,7 +265,8 @@ MQTT
         {
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "data": {
-                "charged": 60,
+                "charged": true,
+                "percentage": 40.2,
                 "voltage": 52.6,
                 "current": 5.76,
                 "temperature": 40
