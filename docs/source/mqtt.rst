@@ -33,12 +33,15 @@ MQTT API
     * - MAPPING_STOP
       - 4
       - 结束建图
-    * - MOVEMENT
+    * - MISSION
       - 5
       - 任务
     * - SWITCH_MODE
       - 6
       - 切换模式：0 导航模式，1 手动模式
+    * - DRIVE
+      - 100
+      - 移动
 
 初始化位置
 >>>>>>>>>>>
@@ -153,6 +156,24 @@ MQTT API
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "messageType": 6,
             "data": 0
+        }
+
+移动
+>>>>>>>>
+ * Topic
+    /root/**${vehicleId}**/cmd/chassis/set
+
+ * Content
+    .. code-block:: json
+
+        {
+            "messageId": 1,
+            "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+            "messageType": 100,
+            "data": {
+                "linear": 0.5,
+                "angular": 0.5
+            }
         }
 
 ----
