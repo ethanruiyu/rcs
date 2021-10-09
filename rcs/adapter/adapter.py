@@ -8,9 +8,9 @@ from rcs.core.models import VehicleModel
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from rcs.common.types import *
+from rcs.common.commands import *
 from threading import Timer
 from rcs.common.enum import *
-
 
 """
 new access vehicle
@@ -126,7 +126,11 @@ class VehicleAdapter:
             self._client.connect('localhost', 1883)
             self._client.reconnect_delay_set(1, 10)
             self._client.loop_start()
-            self._client.subscribe('/root/{0}'.format(self._vehicle.name))
+            self._client.subscribe('/root/{0}/report/#'.format(self._vehicle.name))
+            self._client.message_callback_add('/root/{0}/report/navigation/localization'.format(self._vehicle.name),
+                                              self.on_localization)
+            self._client.message_callback_add('/root/{0}/report/chassis/battery'.format(self._vehicle.name),
+                                              self.on_battery)
         except MQTTException as e:
             self._logger.error(e.__context__)
 
@@ -156,6 +160,40 @@ class VehicleAdapter:
 
     def set_vehicle_offline(self):
         self._vehicle_online = False
+
+    def cmd_init_position(self, pose):
+        data = InitPosition(pose).to_json()
+        self._client.publish('/root/{0}/cmd/navigation/set'.format(self._vehicle.name), data)
+
+    def cmd_drive(self, speed):
+        data = Drive(speed).to_json()
+        self._client.publish('/root/{0}/cmd/chassis/set'.format(self._vehicle.name), data)
+
+    def on_localization(self, client, obj, msg):
+        try:
+            payload = json.loads(msg.payload)
+            pose = Pose(position=Point(payload['data']['pose'][0]),
+                        orientation=Quaternion(payload['data']['pose'][1])).nav2vis()
+            # local_path = Path(data['local_path'])
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(self._vehicle.name, {
+                'type': 'localization',
+                'message': pose
+            })
+        except Exception as e:
+            pass
+
+    def on_battery(self, client, obj, msg):
+        try:
+            payload = json.loads(msg.payload)
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(self._vehicle.name, {
+                'type': 'battery',
+                'message': payload
+            })
+        except Exception as e:
+            pass
 
     def __str__(self):
         return self._vehicle.name

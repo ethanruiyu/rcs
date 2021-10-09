@@ -2,6 +2,7 @@ from rcs.core.models import MapModel
 from django.db import connection
 import math
 from django.conf import settings
+import numpy as np
 
 
 class Point:
@@ -31,10 +32,11 @@ class Point:
         """
         visualization coordinates to navigation coordinates
         """
-        if settings.ACTIVE_MAP_CONFIG:
-            pass
-        else:
-            return None
+        # ipx = x + (width / 2)
+        # ipy = y + (height / 2)
+        #
+        # npx = (ipx * resolution) + origin[0]
+        # npy = ((height - ipy - 1) * resolution) + origin[1]
 
     def __str__(self):
         return [self.x, self.y, self.z]
@@ -110,9 +112,9 @@ class Pose:
 
     def nav2vis(self):
         nav_position = self.position.nav2vis()
-        nav_orientation = self.orientation.to_angle()
+        nav_orientation = self.orientation.__str__()
 
-        return [nav_position, [nav_orientation]]
+        return [nav_position, nav_orientation]
 
     def vis2nav(self):
         pass
@@ -144,3 +146,29 @@ class Path:
 
     def __str__(self):
         return self.path
+
+
+def euler_from_quaternion(x, y, z, w):
+    t0 = +2.0 * (w * x + y * z)
+    t1 = +1.0 - 2.0 * (x * x + y * y)
+    roll_x = math.atan2(t0, t1)
+
+    t2 = +2.0 * (w * y - z * x)
+    t2 = +1.0 if t2 > +1.0 else t2
+    t2 = -1.0 if t2 < -1.0 else t2
+    pitch_y = math.asin(t2)
+
+    t3 = +2.0 * (w * z + x * y)
+    t4 = +1.0 - 2.0 * (y * y + z * z)
+    yaw_z = math.atan2(t3, t4)
+
+    return roll_x, pitch_y, yaw_z  # in radians
+
+
+def euler_to_quaternion(roll, pitch, yaw):
+    qx = np.sin(roll / 2) * np.cos(pitch / 2) * np.cos(yaw / 2) - np.cos(roll / 2) * np.sin(pitch / 2) * np.sin(yaw / 2)
+    qy = np.cos(roll / 2) * np.sin(pitch / 2) * np.cos(yaw / 2) + np.sin(roll / 2) * np.cos(pitch / 2) * np.sin(yaw / 2)
+    qz = np.cos(roll / 2) * np.cos(pitch / 2) * np.sin(yaw / 2) - np.sin(roll / 2) * np.sin(pitch / 2) * np.cos(yaw / 2)
+    qw = np.cos(roll / 2) * np.cos(pitch / 2) * np.cos(yaw / 2) + np.sin(roll / 2) * np.sin(pitch / 2) * np.sin(yaw / 2)
+
+    return [qx, qy, qz, qw], {'x': qx, 'y': qy, 'z': qz, 'w': qw}

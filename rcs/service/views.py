@@ -11,6 +11,9 @@ from .serializers import *
 from .filters import *
 from django_filters import rest_framework
 import yaml
+import json
+from rcs.adapter.adapter import VEHICLE_ADAPTERS
+
 
 DEFAULT_VEHICLE_SETTINGS = [
     {
@@ -164,6 +167,32 @@ class VehicleViewSet(ModelViewSet):
             'online': online
         }
         return Response(data=data, status=200)
+
+    @action(methods=['post'], detail=False)
+    def init_position(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            adapter = VEHICLE_ADAPTERS.get(data['name'])
+            adapter.cmd_init_position(data['pose'])
+        except Exception as e:
+            return Response(data='', status=500)
+        return Response(data='', status=200)
+
+    @action(methods=['post'], detail=False)
+    def drive(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            linear = data['linear']
+            angular = data['angular']
+
+            adapter = VEHICLE_ADAPTERS.get(data['name'])
+            adapter.cmd_drive({
+                'linear': linear,
+                'angular': angular
+            })
+        except Exception as e:
+            return Response(data='', status=500)
+        return Response(data='', status=200)
 
 
 class VehicleSettingViewSet(ModelViewSet):

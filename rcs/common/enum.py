@@ -9,6 +9,7 @@ class CMDEnum(Enum):
     MAPPING_STOP = 4
     MISSION = 5
     SWITCH_MODE = 6
+    DRIVE = 100
 
 
 class VehicleState(Enum):

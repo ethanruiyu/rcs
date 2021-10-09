@@ -22,6 +22,10 @@ class RCSConsumer(AsyncWebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         pass
 
-    async def location(self, event):
+    async def localization(self, event):
         message = event['message']
-        await self.send(text_data=json.dumps({'location': message}))
+        await self.send(text_data=json.dumps({'localization': message}))
+
+    async def battery(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({'battery': message}))
