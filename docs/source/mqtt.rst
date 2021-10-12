@@ -294,6 +294,36 @@ MQTT API
             }
         }
 
+系统占用
+>>>>>>>>
+  * Topic
+     /root/**${vehicleId}**/report/navigation/usage
+  * Content
+     .. code-block:: json
+
+        {
+            "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+            "data": {
+                "cpu": 52.6,
+                "memory": 5.76,
+            }
+        }
+
+底盘基本信息
+>>>>>>>>>>>
+  * Topic
+     /root/**${vehicleId}**/report/chassis/general
+  * Content
+     .. code-block:: json
+
+        {
+            "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+            "data": {
+                "linear": 0.83,
+                "angular": 0.34,
+            }
+        }
+
 --------
 
 ``/log``

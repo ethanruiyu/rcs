@@ -27,6 +27,7 @@ class Simulator:
         self._localization_scd.add_job(self.report_localization, 'interval', seconds=0.1)
         self._battery_scd = BackgroundScheduler()
         self._battery_scd.add_job(self.report_battery, 'interval', seconds=1)
+        self._battery_scd.add_job(self.report_system_usage, 'interval', seconds=1)
         self._move_dt = 0.1
         self._move_scd = BackgroundScheduler()
         self._move_scd.add_job(self.update_pos, 'interval', seconds=self._move_dt)
@@ -79,6 +80,13 @@ class Simulator:
             'temperature': round(random.uniform(30, 45), 2)
         }
         self._client.publish('/root/{0}/report/chassis/battery'.format(self._name), json.dumps(battery_info))
+
+    def report_system_usage(self):
+        system_usage = {
+            'cpu': round(random.uniform(30, 60), 2),
+            'memory': round(random.uniform(50, 60), 2),
+        }
+        self._client.publish('/root/{0}/report/navigation/usage'.format(self._name), json.dumps(system_usage))
 
     def on_init_position(self, msg):
         if self._is_localization:

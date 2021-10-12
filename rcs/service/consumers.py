@@ -29,3 +29,7 @@ class RCSConsumer(AsyncWebsocketConsumer):
     async def battery(self, event):
         message = event['message']
         await self.send(text_data=json.dumps({'battery': message}))
+
+    async def usage(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({'usage': message}))

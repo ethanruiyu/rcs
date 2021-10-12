@@ -23,20 +23,6 @@ accessed vehicle adapters
 VEHICLE_ADAPTERS = {}
 
 
-def on_offline():
-    """
-    disable vehicle adapter
-    """
-    pass
-
-
-def on_online():
-    """
-    enable vehicle adapter
-    """
-    pass
-
-
 def on_heartbeat(client, obj, msg):
     vehicle_name: str = msg.topic.split('/')[2]
     # if in database, update vehicle state and enable adapter
@@ -94,23 +80,6 @@ class MasterMqttAdapter:
     def restart(self):
         return self._client.reconnect()
 
-    # def on_location(self, client, obj, msg):
-    #     try:
-    #         data = json.loads(msg.payload)
-    #         pose = Pose(position=Point(data[0]), orientation=Quaternion(data[1])).nav2vis()
-    #         # local_path = Path(data['local_path'])
-    #
-    #         if self.interval == 1:
-    #             channel_layer = get_channel_layer()
-    #             async_to_sync(channel_layer.group_send)('Robot-1', {
-    #                 'type': 'location',
-    #                 'message': pose
-    #             })
-    #             self.interval = 0
-    #         self.interval += 1
-    #     except Exception as e:
-    #         pass
-
 
 class VehicleAdapter:
     def __init__(self, name):
@@ -131,6 +100,8 @@ class VehicleAdapter:
                                               self.on_localization)
             self._client.message_callback_add('/root/{0}/report/chassis/battery'.format(self._vehicle.name),
                                               self.on_battery)
+            self._client.message_callback_add('/root/{0}/report/navigation/usage'.format(self._vehicle.name),
+                                              self.on_usage)
         except MQTTException as e:
             self._logger.error(e.__context__)
 
@@ -190,6 +161,17 @@ class VehicleAdapter:
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(self._vehicle.name, {
                 'type': 'battery',
+                'message': payload
+            })
+        except Exception as e:
+            pass
+
+    def on_usage(self, client, obj, msg):
+        try:
+            payload = json.loads(msg.payload)
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(self._vehicle.name, {
+                'type': 'usage',
                 'message': payload
             })
         except Exception as e:
