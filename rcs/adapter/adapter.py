@@ -28,8 +28,9 @@ def on_heartbeat(client, obj, msg):
     # if in database, update vehicle state and enable adapter
     if VehicleModel.objects.filter(name=vehicle_name).exists():
         obj = VehicleModel.objects.get(name=vehicle_name)
-        obj.state = VehicleState.IDLE.value
-        obj.save()
+        if obj.state != VehicleState.IDLE.value:
+            obj.state = VehicleState.IDLE.value
+            obj.save()
         if vehicle_name in VEHICLE_ADAPTERS.keys():
             if isinstance(VEHICLE_ADAPTERS[vehicle_name], VehicleAdapter) \
                     and not VEHICLE_ADAPTERS[vehicle_name].is_alive():

@@ -23,3 +23,6 @@ venv/
 
 docs/build/
 templates/
+/media/
+.vscode
+rcs/plugins/planner/build/
