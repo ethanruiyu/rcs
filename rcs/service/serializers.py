@@ -116,3 +116,13 @@ class SystemSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemSettingModel
         fields = '__all__'
+
+
+class ActionSerializer(serializers.ModelSerializer):
+    """
+    Action model serializer
+    """
+
+    class Meta:
+        model = ActionModel
+        fields = '__all__'

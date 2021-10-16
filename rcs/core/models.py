@@ -229,6 +229,18 @@ class SystemSettingModel(models.Model):
         verbose_name = 'System Setting'
 
 
+class ActionModel(models.Model):
+    name = models.CharField(max_length=64)
+    action_type = models.CharField(max_length=64)
+    description = models.CharField(max_length=128, null=True)
+    help = models.TextField(null=True)
+    parameters = models.JSONField(null=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'rcs_action'
+
+
 @receiver(models.signals.post_delete, sender=MapModel)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """

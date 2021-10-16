@@ -70,5 +70,84 @@
       "avatar": "http://localhost:8000/media/vehicles/Robot-1/1.png",
       "action": "null"
     }
+  },
+  {
+    "model": "core.ActionModel",
+    "pk": 1,
+    "fields": {
+      "name": "MOVE_TO_POSITION",
+      "action_type": "Move",
+      "active": true,
+      "parameters": {
+        "x": 0,
+        "y": 0,
+        "orientation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    }
+  },
+  {
+    "model": "core.ActionModel",
+    "pk": 2,
+    "fields": {
+      "name": "CHARGING",
+      "action_type": "Internal",
+      "active": true,
+      "parameters": {
+      }
+    }
+  },
+  {
+    "model": "core.ActionModel",
+    "pk": 3,
+    "fields": {
+      "name": "SWITCH_MAP",
+      "action_type": "Internal",
+      "active": true,
+      "parameters": {
+        "name": "",
+        "url": ""
+      }
+    }
+  },
+  {
+    "model": "core.ActionModel",
+    "pk": 4,
+    "fields": {
+      "name": "OPEN_CUTTER",
+      "action_type": "External",
+      "active": true,
+      "parameters": {
+        "cutter": true
+      }
+    }
+  },
+  {
+    "model": "core.ActionModel",
+    "pk": 5,
+    "fields": {
+      "name": "CLOSE_CUTTER",
+      "action_type": "External",
+      "active": true,
+      "parameters": {
+        "cutter": false
+      }
+    }
+  },
+    {
+    "model": "core.ActionModel",
+    "pk": 5,
+    "fields": {
+      "name": "WAIT",
+      "action_type": "Logic",
+      "active": true,
+      "parameters": {
+        "seconds": 0
+      }
+    }
   }
 ]

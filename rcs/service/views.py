@@ -218,3 +218,8 @@ class SystemSettingViewSet(ModelViewSet):
             obj.save()
 
         return Response(status=200)
+
+
+class ActionViewSet(ModelViewSet):
+    serializer_class = ActionSerializer
+    queryset = ActionModel.objects.all()
