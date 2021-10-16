@@ -12,6 +12,7 @@ db.sqlite3
 db.sqlite3-journal
 */*/migrations/
 .idea
+.vscode
 # Sphinx documentation
 docs/_build/
 
