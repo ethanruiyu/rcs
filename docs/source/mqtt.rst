@@ -1,7 +1,7 @@
 .. _mqtt:
 
 MQTT API
-=======
+=========
 
 结构图：
 
@@ -129,18 +129,50 @@ MQTT API
             "messageId": 1,
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "messageType": 5,
-            "data": {
-                "destinations": [
-                    [[1,2,0], [0,0,0,1]],
-                    [[1,2,0], [0,0,0,1]],
-                    [[1,2,0], [0,0,0,1]],
-                ],
-                "action" : "",
-                "properties": [
-                    {"key": "value"},
-                    {"key": "value"}
-                ]
-            }
+            "data": [
+              {
+                "action": "MOVE_TO_POSITION",
+                "parameters": {
+                  "path": [0, 0, 1, 1]
+                }
+              },
+              {
+                "action": "WAIT",
+                "parameters": {
+                  "seconds": 50
+                }
+              },
+              {
+                "action": "MOVE_TO_POSITION",
+                "parameters": {
+                  "path": [0, 0, 10, 10]
+                }
+              },
+              {
+                "action": "OPEN_CUTTER",
+                "parameters": {
+                  "cutter": true
+                }
+              },
+              {
+                "action": "COVERAGE",
+                "parameters": {
+                  "path": [0, 0, 10, 10， 20， 20]
+                }
+              },
+              {
+                "action": "CLOSE_CUTTER",
+                "parameters": {
+                  "cutter": false
+                }
+              },
+              {
+                "action": "CHARGING",
+                "parameters": {
+                  "time": 0
+                }
+              }
+            ]
         }
 
 切换模式
@@ -310,7 +342,7 @@ MQTT API
         }
 
 底盘基本信息
->>>>>>>>>>>
+>>>>>>>>>>>>>>
   * Topic
      /root/**${vehicleId}**/report/chassis/general
   * Content

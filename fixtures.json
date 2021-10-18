@@ -95,7 +95,7 @@
     "pk": 2,
     "fields": {
       "name": "CHARGING",
-      "action_type": "Internal",
+      "action_type": "Battery",
       "active": true,
       "parameters": {
       }
@@ -140,10 +140,34 @@
   },
     {
     "model": "core.ActionModel",
-    "pk": 5,
+    "pk": 6,
     "fields": {
       "name": "WAIT",
       "action_type": "Logic",
+      "active": true,
+      "parameters": {
+        "seconds": 0
+      }
+    }
+  },
+  {
+    "model": "core.ActionModel",
+    "pk": 7,
+    "fields": {
+      "name": "RELATIVE_MOVE",
+      "action_type": "Move",
+      "active": true,
+      "parameters": {
+        "seconds": 0
+      }
+    }
+  },
+  {
+    "model": "core.ActionModel",
+    "pk": 8,
+    "fields": {
+      "name": "RELATIVE_ROTATION",
+      "action_type": "Move",
       "active": true,
       "parameters": {
         "seconds": 0

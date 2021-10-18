@@ -126,3 +126,13 @@ class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActionModel
         fields = '__all__'
+
+
+class MissionSerializer(serializers.ModelSerializer):
+    """
+    Mission model serializer
+    """
+
+    class Meta:
+        model = MissionModel
+        fields = '__all__'

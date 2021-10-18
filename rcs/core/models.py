@@ -239,6 +239,7 @@ class ActionModel(models.Model):
 
     class Meta:
         db_table = 'rcs_action'
+        verbose_name = 'Actions'
 
 
 @receiver(models.signals.post_delete, sender=MapModel)

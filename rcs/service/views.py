@@ -48,7 +48,8 @@ class MapViewSet(ModelViewSet):
         im = Image.open('media/maps/{0}/map.png'.format(name))
         width, height = im.size
 
-        yaml_file = open('media/maps/{0}/map.yaml'.format(name), 'r', encoding='utf-8')
+        yaml_file = open(
+            'media/maps/{0}/map.yaml'.format(name), 'r', encoding='utf-8')
         content = yaml_file.read()
         yaml_file.close()
         config = yaml.load(content)
@@ -66,7 +67,8 @@ class MapViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
@@ -85,10 +87,12 @@ class MapViewSet(ModelViewSet):
                 PointModel.objects.create(position={'x': item['x'], 'y': item['y']}, name=item['id'], type='Parking',
                                           map=instance)
             if item['type'] == 'Area':
-                AreaModel.objects.create(map=instance, name=item['id'], vertices=str(item['points']))
+                AreaModel.objects.create(
+                    map=instance, name=item['id'], vertices=str(item['points']))
 
             if item['type'] == 'Block':
-                BlockModel.objects.create(map=instance, name=item['id'], vertices=str(item['points']))
+                BlockModel.objects.create(
+                    map=instance, name=item['id'], vertices=str(item['points']))
 
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
@@ -223,3 +227,36 @@ class SystemSettingViewSet(ModelViewSet):
 class ActionViewSet(ModelViewSet):
     serializer_class = ActionSerializer
     queryset = ActionModel.objects.all()
+
+
+class MissionViewSet(ModelViewSet):
+    serializer_class = MissionSerializer
+    queryset = MissionModel.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+    @action(methods=['post'], detail=False)
+    def plan(request, *args, **kwargs):
+
+        return Response(status=200)
+
+    @action(methods=['post'], detail=False)
+    def abort(request, *args, **kwargs):
+
+        return Response(status=200)
+
+    @action(methods=['post'], detail=False)
+    def pause(request, *args, **kwargs):
+
+        return Response(status=200)
+
+    @action(methods=['post'], detail=False)
+    def continued(request, *args, **kwargs):
+
+        return Response(status=200)
