@@ -1,21 +1,21 @@
+import shutil
 import zipfile
 
+import cv2
+import numpy as np
+import yaml
 from PIL import Image
 from django.shortcuts import get_object_or_404
+from django_filters import rest_framework
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
+
 from rcs.adapter.adapter import SCAN_VEHICLES
+from rcs.adapter.adapter import VEHICLE_ADAPTERS
+from .filters import *
 from .paginations import *
 from .serializers import *
-from .filters import *
-from django_filters import rest_framework
-import yaml
-import json
-from rcs.adapter.adapter import VEHICLE_ADAPTERS
-import cv2
-import shutil
-
 
 DEFAULT_VEHICLE_SETTINGS = [
     {
@@ -46,8 +46,8 @@ class MapViewSet(ModelViewSet):
             zip_obj = zipfile.ZipFile(zp)
             for file in zip_obj.namelist():
                 zip_obj.extract(file, 'media/maps/{0}'.format(name))
-        shutil.copyfile('media/maps{0}/map.png'.format(name),
-                        'media/maps{0}/plan.png'.format(name))
+        shutil.copyfile('media/maps/{0}/map.png'.format(name),
+                        'media/maps/{0}/plan.png'.format(name))
         im = Image.open('media/maps/{0}/map.png'.format(name))
         width, height = im.size
 
@@ -79,7 +79,9 @@ class MapViewSet(ModelViewSet):
         PointModel.objects.all().delete()
         AreaModel.objects.all().delete()
         BlockModel.objects.all().delete()
-        print(instance.raw)
+
+        image = cv2.imread('media/maps/{0}/map.png'.format(instance.name))
+        mask = np.zeros(image.shape, dtype='uint8')
         for item in instance.raw:
             if item['type'] == 'Route':
                 PointModel.objects.create(position={'x': item['x'], 'y': item['y']}, name=item['id'], type='Route',
@@ -95,9 +97,23 @@ class MapViewSet(ModelViewSet):
                     map=instance, name=item['id'], vertices=str(item['points']))
 
             if item['type'] == 'Block':
+                block_masks = []
                 BlockModel.objects.create(
                     map=instance, name=item['id'], vertices=str(item['points']))
+                points = []
+                for i in range(0, len(item['points']), 2):
+                    points.append([item['points'][i] + instance.config['width'] / 2 + item['x'],
+                                   item['points'][i + 1] + instance.config['height'] / 2 + item['y']])
+                block_masks.append(points)
 
+                arr = np.array(block_masks, dtype=np.int32)
+                channel_count = image.shape[2]
+                ignore_mask_color = (255,) * channel_count
+
+                cv2.fillPoly(mask, arr, ignore_mask_color)
+        final = image.copy()
+        final[mask > 0] = 0
+        cv2.imwrite('media/maps/{0}/plan.png'.format(instance.name), final)
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
@@ -285,20 +301,16 @@ class MissionViewSet(ModelViewSet):
 
     @action(methods=['post'], detail=False)
     def preview(request, *args, **kwargs):
-
         return Response(status=200)
 
     @action(methods=['post'], detail=False)
     def abort(request, *args, **kwargs):
-
         return Response(status=200)
 
     @action(methods=['post'], detail=False)
     def pause(request, *args, **kwargs):
-
         return Response(status=200)
 
     @action(methods=['post'], detail=False)
     def continued(request, *args, **kwargs):
-
         return Response(status=200)
