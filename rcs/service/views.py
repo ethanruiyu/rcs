@@ -13,6 +13,8 @@ from django_filters import rest_framework
 import yaml
 import json
 from rcs.adapter.adapter import VEHICLE_ADAPTERS
+import cv2
+import shutil
 
 
 DEFAULT_VEHICLE_SETTINGS = [
@@ -44,7 +46,8 @@ class MapViewSet(ModelViewSet):
             zip_obj = zipfile.ZipFile(zp)
             for file in zip_obj.namelist():
                 zip_obj.extract(file, 'media/maps/{0}'.format(name))
-
+        shutil.copyfile('media/maps{0}/map.png'.format(name),
+                        'media/maps{0}/plan.png'.format(name))
         im = Image.open('media/maps/{0}/map.png'.format(name))
         width, height = im.size
 
@@ -53,6 +56,7 @@ class MapViewSet(ModelViewSet):
         content = yaml_file.read()
         yaml_file.close()
         config = yaml.load(content)
+        # generate plan image
         if self.queryset.filter(name=name).exists():
             obj = self.queryset.get(name=name)
             obj.config = {
@@ -230,6 +234,45 @@ class ActionViewSet(ModelViewSet):
 
 
 class MissionViewSet(ModelViewSet):
+    """
+    {
+        "vehicle": "automatch" / "Robot-01",
+        "name": "mission name",
+        "mission": [
+            {
+                "action": "MOVE_TO_POSITION",
+                "parameters": {
+                    "position": [x, y, z],
+                    "orientation": [0, 0, 0, 1]
+                }
+            },
+            {
+                "action": "TURN_ON_CUTTER",
+                "parameters": {}
+            },
+            {
+                "action": "COVERAGE",
+                "parameters": {
+                    "polygon": [x, y, x, y, x, y]
+                }
+            },
+            {
+                "action": "WAIT",
+                "parameters": {
+                    "seconds": 300
+                }
+            },
+            {
+                "action": "TURN_OFF_CUTTER",
+                "parameters": {}
+            },
+            {
+                "action": "CHARGING",
+                "parameters": {}
+            }
+        ]
+    }
+    """
     serializer_class = MissionSerializer
     queryset = MissionModel.objects.all()
 
@@ -240,9 +283,8 @@ class MissionViewSet(ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
     @action(methods=['post'], detail=False)
-    def plan(request, *args, **kwargs):
+    def preview(request, *args, **kwargs):
 
         return Response(status=200)
 
