@@ -11,11 +11,17 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
-from rcs.adapter.adapter import SCAN_VEHICLES
+from rcs.adapter.adapter import SCAN_VEHICLES, VehicleAdapter
 from rcs.adapter.adapter import VEHICLE_ADAPTERS
+from rcs.common.types import Point, Pos
+from rcs.common.utils.conversion import navigation2image
 from .filters import *
 from .paginations import *
 from .serializers import *
+from rcs.plugins.planner import planner_module
+from rcs.common.utils.response import error_response, success_response
+from rcs.plugins.planner.module import move_to_position
+
 
 DEFAULT_VEHICLE_SETTINGS = [
     {
@@ -48,6 +54,21 @@ class MapViewSet(ModelViewSet):
                 zip_obj.extract(file, 'media/maps/{0}'.format(name))
         shutil.copyfile('media/maps/{0}/map.png'.format(name),
                         'media/maps/{0}/plan.png'.format(name))
+
+        img_rgb = cv2.imread('media/maps/{0}/map.png'.format(name))
+        img_rgb[np.where((img_rgb == [0, 0, 0]).all(axis=2))] = [147, 97, 94]
+        # Conv_hsv_Gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+        # ret, mask = cv2.threshold(Conv_hsv_Gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+
+        # indices = np.where(mask == 255)
+        # img_rgb[indices[0], indices[1], :] = [74, 44, 47]
+
+        img_rgb[np.where((img_rgb == [127, 127, 127]).all(axis=2))] = [
+            36, 23, 21]
+        img_rgb[np.where((img_rgb == [255, 255, 255]).all(axis=2))] = [
+            82, 54, 49]
+        cv2.imwrite('media/maps/{0}/ui.png'.format(name), img_rgb)
+
         im = Image.open('media/maps/{0}/map.png'.format(name))
         width, height = im.size
 
@@ -102,11 +123,27 @@ class MapViewSet(ModelViewSet):
                     map=instance, name=item['id'], vertices=str(item['points']))
                 points = []
                 for i in range(0, len(item['points']), 2):
-                    points.append([item['points'][i] + instance.config['width'] / 2 + item['x'],
-                                   item['points'][i + 1] + instance.config['height'] / 2 + item['y']])
+                    image_point = navigation2image(item['points'][i], item['points'][i + 1],instance.config )
+                    points.append([image_point.x, image_point.y])
                 block_masks.append(points)
 
                 arr = np.array(block_masks, dtype=np.int32)
+                channel_count = image.shape[2]
+                ignore_mask_color = (255,) * channel_count
+
+                cv2.fillPoly(mask, arr, ignore_mask_color)
+
+            if item['type'] == 'Wall':
+                wall_masks = []
+                BlockModel.objects.create(
+                    map=instance, name=item['id'], vertices=str(item['points']))
+                points = []
+                for i in range(0, len(item['points']), 2):
+                    image_point = navigation2image(item['points'][i], item['points'][i + 1],instance.config )
+                    points.append([image_point.x, image_point.y])
+                wall_masks.append(points)
+
+                arr = np.array(wall_masks, dtype=np.int32)
                 channel_count = image.shape[2]
                 ignore_mask_color = (255,) * channel_count
 
@@ -150,11 +187,6 @@ class AreaViewSet(ModelViewSet):
 class BlockViewSet(ModelViewSet):
     serializer_class = BlockSerializer
     queryset = BlockModel.objects.all()
-
-
-class PathViewSet(ModelViewSet):
-    serializer_class = PathSerializer
-    queryset = PathModel.objects.all()
 
 
 class VehicleViewSet(ModelViewSet):
@@ -300,17 +332,35 @@ class MissionViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(methods=['post'], detail=False)
-    def preview(request, *args, **kwargs):
+    def preview(self, request, *args, **kwargs):
+        data = request.data
+        vehicle = data['vehicle']
+        raw = data['raw']
+        adapter = VEHICLE_ADAPTERS.get(vehicle)
+        if adapter is None or adapter.get_position() is None:
+            return error_response(detail='not init position')
+        start_position = Point(x=adapter.get_position()[
+                               0][0], y=adapter.get_position()[0][1])
+
+        all_path = []
+        for i in raw:
+            if i['action'] == 'MOVE_TO_POSITION':
+                target_position = Point(x=i['parameters']['position'][0], y=i['parameters']['position'][1])
+                step_path = move_to_position(start_position, target_position)
+                start_position = target_position
+                all_path.append(step_path)
+
+        # print(all_path)
+        return success_response(data=all_path)
+
+    @action(methods=['post'], detail=False)
+    def abort(self, request, *args, **kwargs):
         return Response(status=200)
 
     @action(methods=['post'], detail=False)
-    def abort(request, *args, **kwargs):
+    def pause(self, request, *args, **kwargs):
         return Response(status=200)
 
     @action(methods=['post'], detail=False)
-    def pause(request, *args, **kwargs):
-        return Response(status=200)
-
-    @action(methods=['post'], detail=False)
-    def continued(request, *args, **kwargs):
+    def continued(self, request, *args, **kwargs):
         return Response(status=200)

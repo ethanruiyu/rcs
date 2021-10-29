@@ -56,16 +56,6 @@ class AreaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PathSerializer(serializers.ModelSerializer):
-    """
-    Path model serializer
-    """
-
-    class Meta:
-        model = PathModel
-        fields = '__all__'
-
-
 class VehicleSerializer(serializers.ModelSerializer):
     """
     Vehicle model serializer

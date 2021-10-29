@@ -90,7 +90,7 @@ int add(int i, int j, cv::Point p)
     return i + j;
 }
 
-void plan(std::string imgPath, cv::Point start, cv::Point end)
+std::vector<cv::Point> plan(std::string imgPath, cv::Point start, cv::Point end, float dilate)
 {
     cv::Mat tmp, map_rgb;
     cv::Mat map1 = cv::imread(imgPath);
@@ -98,6 +98,7 @@ void plan(std::string imgPath, cv::Point start, cv::Point end)
     cv::threshold(tmp, tmp, 130, 255, cv::THRESH_BINARY_INV);
     dilateMap(tmp, tmp, 20);
     std::vector<cv::Point> res = jpsPlanner(start, end, tmp);
+    return res;
 }
 
 PYBIND11_MODULE(planner_module, m)
@@ -105,5 +106,5 @@ PYBIND11_MODULE(planner_module, m)
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
     m.def("add", &add, "A function which adds two numbers");
-    m.def("plan", &plan, "A function which adds two numbers");
+    m.def("plan", &plan, py::return_value_policy::reference);
 }

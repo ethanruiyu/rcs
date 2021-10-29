@@ -99,7 +99,9 @@ MQTT API
             "messageId": 1,
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "messageType": 3,
-            "data": null
+            "data": {
+                "name": "map_name"
+            }
         }
 
 结束建图
@@ -114,7 +116,9 @@ MQTT API
             "messageId": 1,
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "messageType": 4,
-            "data": null
+            "data": {
+                "name": "map_name"
+            }
         }
 
 任务
@@ -157,7 +161,7 @@ MQTT API
               {
                 "action": "COVERAGE",
                 "parameters": {
-                  "path": [0, 0, 10, 10， 20， 20]
+                  "path": [0, 0, 10, 10, 20, 20]
                 }
               },
               {
@@ -353,6 +357,21 @@ MQTT API
             "data": {
                 "linear": 0.83,
                 "angular": 0.34,
+            }
+        }
+
+导航基本信息
+>>>>>>>>>>>>>>>>
+  * Topic
+     /root/**${vehicleId}**/report/chassis/general
+  * Content
+     .. code-block:: json
+
+        {
+            "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+            "data": {
+                "mapping": true,
+                "moving": false,
             }
         }
 

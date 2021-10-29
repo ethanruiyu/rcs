@@ -1,15 +1,13 @@
 import json
+import logging
 import math
 import random
 
-from paho.mqtt.client import Client
-from django.shortcuts import render
-from threading import Thread
 from apscheduler.schedulers.background import BackgroundScheduler
-import logging
-from rcs.common.enum import CMDEnum
-import time
-from rcs.common.types import euler_from_quaternion, euler_to_quaternion
+from paho.mqtt.client import Client
+
+from rcs.common.enum import CommandEnum
+from rcs.common.utils.conversion import quaternion2euler, euler2quaternion
 
 
 class SimulatorPool:
@@ -120,7 +118,7 @@ class Simulator:
             self._move_scd.pause()
         position = self._pose[0]
         quaternion = self._pose[1]
-        _, _, yaw = euler_from_quaternion(quaternion[0], quaternion[1], quaternion[2], quaternion[3])
+        _, _, yaw = quaternion2euler(quaternion[0], quaternion[1], quaternion[2], quaternion[3])
         # yaw += self._angular * self._move_dt
         # yaw -= 2 * math.pi * math.floor((yaw + math.pi) / (2 * math.pi))
         # position[0] += math.cos(yaw) * self._linear * self._move_dt - math.sin(yaw) * self._angular * self._move_dt
@@ -130,19 +128,19 @@ class Simulator:
         # position[0] += math.cos(yaw) * self._linear
         # position[1] += - math.sin(yaw) * self._linear
 
-        yaw = yaw + -self._angular * self._move_dt
+        yaw = yaw + self._angular * self._move_dt
         # yaw -= 2 * math.pi * math.floor((yaw + math.pi) / (2 * math.pi))
-        position[0] += math.cos(yaw) * self._linear * self._move_dt - math.sin(yaw) * -self._angular * self._move_dt
-        position[1] -= math.cos(yaw) * -self._angular * self._move_dt + math.sin(yaw) * self._linear * self._move_dt
+        position[0] += math.cos(yaw) * self._linear * self._move_dt - math.sin(yaw) * self._angular * self._move_dt
+        position[1] += math.cos(yaw) * self._angular * self._move_dt + math.sin(yaw) * self._linear * self._move_dt
 
-        q, _ = euler_to_quaternion(0, 0, yaw)
+        q, _ = euler2quaternion(0, 0, yaw)
         self._pose[0] = position
         self._pose[1] = q
 
     def dispatch_cmd(self, client, obj, msg):
         data = json.loads(msg.payload)
-        if data['messageType'] == CMDEnum.INIT_POSITION.value:
+        if data['messageType'] == CommandEnum.INIT_POSITION.value:
             self.on_init_position(data)
 
-        if data['messageType'] == CMDEnum.DRIVE.value:
+        if data['messageType'] == CommandEnum.DRIVE.value:
             self.on_move(data)

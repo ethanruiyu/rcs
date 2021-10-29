@@ -1,8 +1,37 @@
-from rcs.core.models import MapModel
-from django.db import connection
-import math
-from django.conf import settings
-import numpy as np
+class VehicleState:
+    OFFLINE = 'offline'
+    IDLE = 'idle'
+    BUSY = 'busy'
+    PAUSE = 'pause'
+    ERROR = 'error'
+    CHARGING = 'charging'
+
+    CHOICES = [
+        (OFFLINE, 'offline'),
+        (IDLE, 'idle'),
+        (BUSY, 'busy'),
+        (PAUSE, 'pause'),
+        (ERROR, 'error'),
+        (CHARGING, 'charging'),
+    ]
+
+
+class MissionState:
+    RAW = 'raw'
+    DISPATCH = 'dispatch'
+    PROCESSED = 'processed'
+    FINISHED = 'finished'
+    PAUSED = 'paused'
+    ABORT = 'abort'
+
+    CHOICES = [
+        (RAW, 'raw'),
+        (DISPATCH, 'dispatch'),
+        (PROCESSED, 'processed'),
+        (FINISHED, 'finished'),
+        (PAUSED, 'paused'),
+        (ABORT, 'abort')
+    ]
 
 
 class Point:
@@ -10,54 +39,26 @@ class Point:
     y: float = 0
     z: float = 0
 
-    def __init__(self, point: list):
-        super(Point, self).__init__()
-        self.x = point[0]
-        self.y = point[1]
-        self.z = point[2]
+    def __init__(self, x=0, y=0, z=0):
+        self.x = x
+        self.y = y
+        self.z = z
 
-    def nav2vis(self):
-        """
-        navigation coordinates to visualization coordinates
-        """
-        ipx = int((self.x - settings.ACTIVE_MAP_CONFIG['origin'][0]) / settings.ACTIVE_MAP_CONFIG['resolution'])
-        ipy = int(settings.ACTIVE_MAP_CONFIG['height'] - (self.y - settings.ACTIVE_MAP_CONFIG['origin'][1]) / settings.ACTIVE_MAP_CONFIG['resolution'] - 1)
+    def __tuple__(self):
+        return (self.x, self.y)
 
-        vpx = ipx - settings.ACTIVE_MAP_CONFIG['width'] / 2
-        vpy = ipy - settings.ACTIVE_MAP_CONFIG['height'] / 2
-
-        return [vpx, vpy, 0]
-
-    def vis2nav(self):
-        """
-        visualization coordinates to navigation coordinates
-        """
-        # ipx = x + (width / 2)
-        # ipy = y + (height / 2)
-        #
-        # npx = (ipx * resolution) + origin[0]
-        # npy = ((height - ipy - 1) * resolution) + origin[1]
-
-    def __str__(self):
+    def __list__(self):
         return [self.x, self.y, self.z]
 
     def __dict__(self):
         return {
-            'x', self.x,
-            'y', self.y,
-            'z', self.z,
+            'x': self.x,
+            'y': self.y,
+            'z': self.z
         }
 
-
-class Angle:
-    angle: float = 0
-
-    def __init__(self, **kwargs):
-        super(Angle, self).__init__()
-        self.angle = kwargs['angle']
-
-    def __str__(self):
-        return self.angle
+    def __repr__(self) -> list:
+        return self.__list__()
 
 
 class Quaternion:
@@ -66,109 +67,37 @@ class Quaternion:
     z: float = 0
     w: float = 0
 
-    def __init__(self, orientation: list):
-        super(Quaternion, self).__init__()
-        self.x = orientation[0]
-        self.y = orientation[1]
-        self.z = orientation[2]
-        self.w = orientation[3]
+    def __init__(self, x=0, y=0, z=0, w=0):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.w = w
 
-    def to_angle(self):
-        # t0 = +2.0 * (self.w * self.x + self.y * self.z)
-        # t1 = +1.0 - 2.0 * (self.x * self.x + self.y * self.y)
-        # roll_x = math.atan2(t0, t1)
-        #
-        # t2 = +2.0 * (self.w * self.y - self.z * self.x)
-        # t2 = +1.0 if t2 > +1.0 else t2
-        # t2 = -1.0 if t2 < -1.0 else t2
-        # pitch_y = math.asin(t2)
-
-        t3 = +2.0 * (self.w * self.z + self.x * self.y)
-        t4 = +1.0 - 2.0 * (self.y * self.y + self.z * self.z)
-        yaw_z = math.atan2(t3, t4)
-
-        return -(180 / math.pi * yaw_z) - 90  # in radians
-
-    def __str__(self):
+    def __list__(self):
         return [self.x, self.y, self.z, self.w]
 
     def __dict__(self):
         return {
-            'x', self.x,
-            'y', self.y,
-            'z', self.z,
-            'w', self.w
+            'x': self.x,
+            'y': self.y,
+            'z': self.z,
+            'w': self.w
         }
 
-
-class Pose:
-    position: Point = Point([0, 0, 0])
-    orientation: Quaternion = Quaternion([0, 0, 0, 0])
-
-    def __init__(self, **kwargs):
-        super(Pose, self).__init__()
-        self.position = kwargs['position']
-        self.orientation = kwargs['orientation']
-
-    def nav2vis(self):
-        nav_position = self.position.nav2vis()
-        nav_orientation = self.orientation.__str__()
-
-        return [nav_position, nav_orientation]
-
-    def vis2nav(self):
-        pass
-
-    def __str__(self):
-        return [self.position.__str__(), self.orientation.__str__()]
-
-    def __dict__(self):
-        return {
-            'position': {
-                'x': self.position.x,
-                'y': self.position.y,
-                'z': self.position.z
-            },
-            'orientation': {
-                'x': self.orientation.x,
-                'y': self.orientation.y,
-                'z': self.orientation.z,
-                'w': self.orientation.w
-            }
-        }
+    def __repr__(self) -> list:
+        return self.__list__()
 
 
-class Path:
-    path: list = []
+class Pos:
+    point = Point()
+    orientation = Quaternion()
 
-    def __init__(self, path: list):
-        self.path = path
+    def __init__(self, pos: list):
+        self.point = Point(pos[0][0], pos[0][1], pos[0][2])
+        self.orientation = Quaternion(pos[1][0], pos[1][1], pos[1][2], pos[1][3])
 
-    def __str__(self):
-        return self.path
+    def __list__(self):
+        return [self.point, self.orientation]
 
-
-def euler_from_quaternion(x, y, z, w):
-    t0 = +2.0 * (w * x + y * z)
-    t1 = +1.0 - 2.0 * (x * x + y * y)
-    roll_x = math.atan2(t0, t1)
-
-    t2 = +2.0 * (w * y - z * x)
-    t2 = +1.0 if t2 > +1.0 else t2
-    t2 = -1.0 if t2 < -1.0 else t2
-    pitch_y = math.asin(t2)
-
-    t3 = +2.0 * (w * z + x * y)
-    t4 = +1.0 - 2.0 * (y * y + z * z)
-    yaw_z = math.atan2(t3, t4)
-
-    return roll_x, pitch_y, yaw_z  # in radians
-
-
-def euler_to_quaternion(roll, pitch, yaw):
-    qx = np.sin(roll / 2) * np.cos(pitch / 2) * np.cos(yaw / 2) - np.cos(roll / 2) * np.sin(pitch / 2) * np.sin(yaw / 2)
-    qy = np.cos(roll / 2) * np.sin(pitch / 2) * np.cos(yaw / 2) + np.sin(roll / 2) * np.cos(pitch / 2) * np.sin(yaw / 2)
-    qz = np.cos(roll / 2) * np.cos(pitch / 2) * np.sin(yaw / 2) - np.sin(roll / 2) * np.sin(pitch / 2) * np.cos(yaw / 2)
-    qw = np.cos(roll / 2) * np.cos(pitch / 2) * np.cos(yaw / 2) + np.sin(roll / 2) * np.sin(pitch / 2) * np.sin(yaw / 2)
-
-    return [qx, qy, qz, qw], {'x': qx, 'y': qy, 'z': qz, 'w': qw}
+    def __repr__(self):
+        return self.__list__()

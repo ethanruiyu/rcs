@@ -1,16 +1,15 @@
 import json
 import logging
+from threading import Timer
 
 import paho.mqtt.client as mqtt
-from paho.mqtt import MQTTException
-
-from rcs.core.models import VehicleModel
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from rcs.common.types import *
-from rcs.common.commands import *
-from threading import Timer
-from rcs.common.enum import *
+from paho.mqtt import MQTTException
+
+from rcs.common.commands import InitPosition, Drive
+from rcs.common.types import VehicleState
+from rcs.core.models import VehicleModel
 
 """
 new access vehicle
@@ -28,8 +27,8 @@ def on_heartbeat(client, obj, msg):
     # if in database, update vehicle state and enable adapter
     if VehicleModel.objects.filter(name=vehicle_name).exists():
         obj = VehicleModel.objects.get(name=vehicle_name)
-        if obj.state != VehicleState.IDLE.value:
-            obj.state = VehicleState.IDLE.value
+        if obj.state != VehicleState.IDLE:
+            obj.state = VehicleState.IDLE
             obj.save()
         if vehicle_name in VEHICLE_ADAPTERS.keys():
             if isinstance(VEHICLE_ADAPTERS[vehicle_name], VehicleAdapter) \
@@ -84,12 +83,16 @@ class MasterMqttAdapter:
 
 class VehicleAdapter:
     def __init__(self, name):
+        self._name = name
+        self._position = None
         self._client = mqtt.Client(client_id=name, clean_session=True)
         self._enabled = False
         self._logger = logging.getLogger()
         self._vehicle = VehicleModel.objects.get(name=name)
         self._vehicle_online = False
         self._alive_toggle = None
+        self._is_localization = False
+        self._battery = 100
 
     def enable(self):
         try:
@@ -130,6 +133,9 @@ class VehicleAdapter:
         self._alive_toggle.setDaemon(True)
         self._alive_toggle.start()
 
+    def get_position(self):
+        return self._position
+
     def set_vehicle_offline(self):
         self._vehicle_online = False
 
@@ -144,10 +150,11 @@ class VehicleAdapter:
     def on_localization(self, client, obj, msg):
         try:
             payload = json.loads(msg.payload)
-            pose = Pose(position=Point(payload['data']['pose'][0]),
-                        orientation=Quaternion(payload['data']['pose'][1])).nav2vis()
+            pose = payload['data']['pose']
+            # pose = Pose(position=Point(payload['data']['pose'][0]),
+            #             orientation=Quaternion(payload['data']['pose'][1])).nav2vis()
             # local_path = Path(data['local_path'])
-
+            self._position = pose
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(self._vehicle.name, {
                 'type': 'localization',

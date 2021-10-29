@@ -25,5 +25,5 @@ venv/
 docs/build/
 templates/
 /media/
-.vscode
+.vscode/
 rcs/plugins/planner/build/

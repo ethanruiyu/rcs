@@ -211,4 +211,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1)
 }
 
-ACTIVE_MAP_CONFIG = dict
+ACTIVE_MAP_CONFIG = {
+    'resolution': 0,
+    'origin': []
+}

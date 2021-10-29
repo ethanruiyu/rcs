@@ -4,7 +4,7 @@ import shutil
 from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
-from rcs.common.enum import *
+from rcs.common.types import VehicleState, MissionState
 
 
 def map_dir_name(instance, filename):
@@ -48,10 +48,10 @@ class MapModel(models.Model):
         if self.active:
             try:
                 temp = MapModel.objects.get(active=True)
+                settings.ACTIVE_MAP_CONFIG = temp.config
                 if self != temp:
                     temp.active = False
                     temp.save()
-                    settings.ACTIVE_MAP_CONFIG = temp.config
             except MapModel.DoesNotExist:
                 pass
 
@@ -98,6 +98,28 @@ class BlockModel(models.Model):
         db_table = 'rcs_block'
 
 
+class WallModel(models.Model):
+    name = models.CharField(max_length=64)
+    vertices = models.TextField(null=True)
+    active = models.BooleanField(default=True)
+    map = models.ForeignKey(
+        'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
+
+    class Meta:
+        db_table = 'rcs_wall'
+
+
+class ForbiddenModel(models.Model):
+    name = models.CharField(max_length=64)
+    vertices = models.TextField(null=True)
+    active = models.BooleanField(default=True)
+    map = models.ForeignKey(
+        'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
+
+    class Meta:
+        db_table = 'rcs_forbidden'
+
+
 class AreaModel(models.Model):
     name = models.CharField(max_length=64)
     vertices = models.TextField(null=True)
@@ -126,35 +148,9 @@ class VehicleTypeModel(models.Model):
         db_table = 'rcs_vehicle_type'
 
 
-class PathModel(models.Model):
-    name = models.CharField(max_length=64)
-    sourcePoint = models.ForeignKey('core.PointModel', on_delete=models.CASCADE, related_name='sourcePoint',
-                                    db_column='sourcePoint')
-    destinationPoint = models.ForeignKey('core.PointModel', on_delete=models.CASCADE, related_name='destinationPoint',
-                                         db_column='destinationPoint')
-    length = models.FloatField()
-    maxVelocity = models.FloatField(default=1.0, db_column='maxVelocity')
-    maxReverseVelocity = models.FloatField(
-        default=1.0, db_column='maxReverseVelocity')
-    locked = models.BooleanField(default=False)
-    map = models.ForeignKey(
-        'core.MapModel', on_delete=models.CASCADE, db_column='mapId')
-
-    class Meta:
-        db_table = 'rcs_path'
-
-
 class VehicleModel(models.Model):
-    VEHICLE_STATE = (
-        ('offline', 'OFFLINE'),
-        ('idle', 'IDLE'),
-        ('busy', 'BUSY'),
-        ('pause', 'PAUSE'),
-        ('error', 'ERROR'),
-        ('charging', 'CHARGING')
-    )
     name = models.CharField(max_length=64)
-    state = models.CharField(choices=VEHICLE_STATE, default='offline', max_length=32)
+    state = models.CharField(choices=VehicleState.CHOICES, default=VehicleState.OFFLINE, max_length=32)
     position = models.JSONField(default=dict)
     type = models.ForeignKey(
         'core.VehicleTypeModel', on_delete=models.CASCADE, null=True, blank=True, default=1, db_column='typeId')
@@ -170,25 +166,18 @@ class VehicleModel(models.Model):
 
 
 class MissionModel(models.Model):
-    MISSION_STATE = (
-        (0, 'RAW'),
-        (1, 'DISPATCH'),
-        (2, 'PROCESSED'),
-        (3, 'FINISHED'),
-        (4, 'PAUSED'),
-        (5, 'ABORT')
-    )
     sn = models.CharField(max_length=128)
     name = models.CharField(max_length=128, null=True, blank=True)
-    state = models.IntegerField(choices=MISSION_STATE, default=0)
-    create_time = models.DateTimeField(auto_now_add=True)
-    begin_time = models.DateTimeField(null=True)
-    finish_time = models.DateTimeField(null=True)
+    state = models.IntegerField(choices=MissionState.CHOICES, default=MissionState.RAW)
+    createTime = models.DateTimeField(auto_now_add=True, db_column='createTime')
+    beginTime = models.DateTimeField(null=True, db_column='beginTime')
+    finishTime = models.DateTimeField(null=True, db_column='finishTime')
     reason = models.TextField(null=True)
-    track = models.JSONField(default=list)
-    plan = models.JSONField(default=list)
-    vehicle = models.ForeignKey('core.VehicleModel', on_delete=models.CASCADE, null=True)
+    footprint = models.JSONField(default=list)
+    path = models.JSONField(default=list)
+    vehicle = models.ForeignKey('core.VehicleModel', on_delete=models.DO_NOTHING)
     isTemplate = models.BooleanField(default=False, db_column='isTemplate')
+    raw = models.JSONField(default=dict)
 
     class Meta:
         db_table = 'rcs_mission'

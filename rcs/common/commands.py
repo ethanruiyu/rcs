@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from rcs.common.enum import *
-from rcs.common.types import *
+from rcs.common.types import Pos
 
 
 class Command:
@@ -18,10 +18,22 @@ class Command:
         self._message_id += value
 
 
+    def __dict__(self):
+        return {
+            'timestamp': self._timestamp,
+            'messageId': self.message_id,
+            'messageType': self._message_type,
+            'data': self._data
+        }
+
+    def __repr__(self):
+        return self.__dict__()
+
+
 class InitPosition(Command):
-    def __init__(self, position: Pose):
+    def __init__(self, position: Pos):
         super(InitPosition, self).__init__()
-        self._message_type = CMDEnum.INIT_POSITION.value
+        self._message_type = CommandEnum.INIT_POSITION.value
         self._data = position
 
     def to_json(self):
@@ -36,7 +48,7 @@ class InitPosition(Command):
 class Drive(Command):
     def __init__(self, speed):
         super(Drive, self).__init__()
-        self._message_type = CMDEnum.DRIVE.value
+        self._message_type = CommandEnum.DRIVE.value
         self._data = speed
 
     def to_json(self):
