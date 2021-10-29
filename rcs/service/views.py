@@ -123,8 +123,10 @@ class MapViewSet(ModelViewSet):
                     map=instance, name=item['id'], vertices=str(item['points']))
                 points = []
                 for i in range(0, len(item['points']), 2):
-                    image_point = navigation2image(item['points'][i], item['points'][i + 1],instance.config )
-                    points.append([image_point.x, image_point.y])
+                    image_point = navigation2image(
+                        item['points'][i] + item['x'], item['points'][i + 1] + item['y'], instance.config)
+                    points.append([image_point.x,
+                                  image_point.y])
                 block_masks.append(points)
 
                 arr = np.array(block_masks, dtype=np.int32)
@@ -139,7 +141,8 @@ class MapViewSet(ModelViewSet):
                     map=instance, name=item['id'], vertices=str(item['points']))
                 points = []
                 for i in range(0, len(item['points']), 2):
-                    image_point = navigation2image(item['points'][i], item['points'][i + 1],instance.config )
+                    image_point = navigation2image(
+                        item['points'][i], item['points'][i + 1], instance.config)
                     points.append([image_point.x, image_point.y])
                 wall_masks.append(points)
 
@@ -345,7 +348,8 @@ class MissionViewSet(ModelViewSet):
         all_path = []
         for i in raw:
             if i['action'] == 'MOVE_TO_POSITION':
-                target_position = Point(x=i['parameters']['position'][0], y=i['parameters']['position'][1])
+                target_position = Point(
+                    x=i['parameters']['position'][0], y=i['parameters']['position'][1])
                 step_path = move_to_position(start_position, target_position)
                 start_position = target_position
                 all_path.append(step_path)
