@@ -172,43 +172,57 @@ MQTT API
               {
                 "action": "MOVE_TO_POSITION",
                 "parameters": {
-                  "path": [0, 0, 1, 1]
+                  "path": [0, 0, 1, 1],
+                  "seconds": null
+                  "cutter": null
                 }
               },
               {
                 "action": "WAIT",
                 "parameters": {
-                  "seconds": 50
+                  "path": null,
+                  "seconds": 50,
+                  "cutter": null
                 }
               },
               {
                 "action": "MOVE_TO_POSITION",
                 "parameters": {
                   "path": [0, 0, 10, 10]
+                  "seconds": null,
+                  "cutter": null
                 }
               },
               {
                 "action": "OPEN_CUTTER",
                 "parameters": {
+                  "path": [0, 0, 10, 10]
+                  "seconds": null,
                   "cutter": true
                 }
               },
               {
                 "action": "COVERAGE",
                 "parameters": {
-                  "path": [0, 0, 10, 10, 20, 20]
+                  "path": [0, 0, 10, 10, 20, 20],
+                  "seconds": null,
+                  "cutter": null
                 }
               },
               {
                 "action": "CLOSE_CUTTER",
                 "parameters": {
+                  "path": [0, 0, 10, 10, 20, 20],
+                  "seconds": null,
                   "cutter": false
                 }
               },
               {
                 "action": "CHARGING",
                 "parameters": {
-                  "time": 0
+                  "path": [0, 0, 10, 10, 20, 20],
+                  "seconds": null,
+                  "cutter": false
                 }
               }
             ]
@@ -387,6 +401,8 @@ MQTT API
 >>>>>>>>
   * Topic
      /root/**${vehicleId}**/report/navigation/usage
+  * Interval
+    10 秒
   * Content
      .. code-block:: json
 
@@ -408,23 +424,25 @@ MQTT API
         {
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "data": {
-                "linear": 0.83,
-                "angular": 0.34,
             }
         }
 
 导航基本信息
 >>>>>>>>>>>>>>>>
   * Topic
-     /root/**${vehicleId}**/report/chassis/general
+     /root/**${vehicleId}**/report/navigation/general
+  * Interval
+    0.1 秒
   * Content
      .. code-block:: json
 
         {
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "data": {
-                "mapping": true,
-                "moving": false,
+              "currentPosition": [1, 1, 1, 1, 1, 1, 1],
+              "scan": [[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
+              "linear": 0.5,
+              "angular": 0.5
             }
         }
 
