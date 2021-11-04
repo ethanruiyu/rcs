@@ -19,30 +19,37 @@ from django.urls import path, include
 from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenRefreshView
-
-from rcs.account.views import *
-from rcs.adapter.adapter import MasterMqttAdapter
-from rcs.core.models import MapModel
+from django.conf import settings
+from .communication.master import Master
+from rcs.account.views import UserProfileViewSet, RCSTokenObtainPairView
+# from rcs.adapter.adapter import MasterMqttAdapter
+# from rcs.core.models import MapModel
 from rcs.simulator.views import Simulator
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('rcs.service.urls')),
+    # path('api/', include('rcs.service.urls')),
     path('api/account/', include('rcs.account.urls')),
+    path('api/', include('rcs.map.urls')),
+    path('api/', include('rcs.vehicle.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/doc/',
+         SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 
     path('api/token/', RCSTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    url(r'media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT, 'show_indexes': True}),
+    url(r'media/(?P<path>.*)', serve,
+        {"document_root": settings.MEDIA_ROOT, 'show_indexes': True}),
 ]
 
 sim = Simulator('Robot-1')
 sim.enable()
 
-master = MasterMqttAdapter()
-master.enable()
 
-if MapModel.objects.filter(active=True).exists():
-    settings.ACTIVE_MAP_CONFIG = MapModel.objects.filter(active=True).first().config
+
+master = Master('master', clean_session=True)
+master.run()
+
+# if MapModel.objects.filter(active=True).exists():
+#     settings.ACTIVE_MAP_CONFIG = MapModel.objects.filter(active=True).first().config

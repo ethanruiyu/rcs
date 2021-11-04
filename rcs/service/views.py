@@ -285,45 +285,6 @@ class ActionViewSet(ModelViewSet):
 
 
 class MissionViewSet(ModelViewSet):
-    """
-    {
-        "vehicle": "automatch" / "Robot-01",
-        "name": "mission name",
-        "mission": [
-            {
-                "action": "MOVE_TO_POSITION",
-                "parameters": {
-                    "position": [x, y, z],
-                    "orientation": [0, 0, 0, 1]
-                }
-            },
-            {
-                "action": "TURN_ON_CUTTER",
-                "parameters": {}
-            },
-            {
-                "action": "COVERAGE",
-                "parameters": {
-                    "polygon": [x, y, x, y, x, y]
-                }
-            },
-            {
-                "action": "WAIT",
-                "parameters": {
-                    "seconds": 300
-                }
-            },
-            {
-                "action": "TURN_OFF_CUTTER",
-                "parameters": {}
-            },
-            {
-                "action": "CHARGING",
-                "parameters": {}
-            }
-        ]
-    }
-    """
     serializer_class = MissionSerializer
     queryset = MissionModel.objects.all()
 

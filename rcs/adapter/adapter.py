@@ -49,7 +49,7 @@ def on_heartbeat(client, obj, msg):
 
 class MasterMqttAdapter:
     def __init__(self):
-        self._client = mqtt.Client(client_id='master', clean_session=True)
+        self._client = mqtt.Client(client_id='master1', clean_session=True)
         self._enabled = False
         self._logger = logging.getLogger()
         self.interval = 0
@@ -144,7 +144,7 @@ class VehicleAdapter:
         self._client.publish('/root/{0}/cmd/navigation/set'.format(self._vehicle.name), data)
 
     def cmd_drive(self, speed):
-        data = Drive(speed).to_json()
+        data = Drive(speed).__json__()
         self._client.publish('/root/{0}/cmd/chassis/set'.format(self._vehicle.name), data)
 
     def on_localization(self, client, obj, msg):

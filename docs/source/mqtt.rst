@@ -45,17 +45,52 @@ MQTT API
 
 初始化位置
 >>>>>>>>>>>
- * Topic
-    /root/**${vehicleId}**/cmd/navigation/set
- * Content
-    .. code-block:: json
+ * Set
+    - Topic
+       /root/**${vehicleId}**/cmd/navigation/set
 
-        {
-            "messageId": 1,
-            "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
-            "messageType": 0,
-            "data": [[1,2,3],[1,2,3,4]]
-        }
+    - Content
+       .. code-block:: json
+
+          {
+              "messageId": 1,
+              "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+              "messageType": 0,
+              "data": [1, 1, 0, 0, 0, 0, 1]
+          }
+
+ * Ack
+    - Topic
+       /root/**${vehicleId}**/cmd/navigation/ack
+
+    - Content
+       .. code-block:: json
+
+          {
+              "messageId": 1,
+              "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+              "messageType": 0,
+              "data": {
+                "code": 0
+              }
+          }
+
+ * Notify
+    - Topic
+       /root/**${vehicleId}**/cmd/navigation/notify
+
+    - Content
+       .. code-block:: json
+
+          {
+              "messageId": 1,
+              "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+              "messageType": 0,
+              "data": {
+                "code": 0
+              }
+          }
+
 
 暂停
 >>>>
@@ -90,7 +125,7 @@ MQTT API
 开始建图
 >>>>>>>>
  * Topic
-    /root/**${vehicleId}**/cmd/navigation/set
+    /root/**${vehicleId}**/cmd/map/set
 
  * Content
     .. code-block:: json
@@ -107,7 +142,7 @@ MQTT API
 结束建图
 >>>>>>>>
  * Topic
-    /root/**${vehicleId}**/cmd/navigation/set
+    /root/**${vehicleId}**/cmd/map/set
 
  * Content
     .. code-block:: json
@@ -228,11 +263,14 @@ MQTT API
     * - SET_MAP
       - 0
       - 设置地图
+    * - SET_LNG_LAT
+      - 设置经纬度
+      - 100
 
 设置地图
 >>>>>>>>
  * Topic
-    /root/**${vehicleId}**/setting/navigation/set
+    /root/**${vehicleId}**/setting/map/set
 
  * Content
     .. code-block:: json
@@ -242,6 +280,21 @@ MQTT API
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "messageType": 0,
             "data": "地图名"
+        }
+
+设置经纬度
+>>>>>>>>>>
+ * Topic
+    /root/**${vehicleId}**/setting/navigation/set
+
+ * Content
+    .. code-block:: json
+
+        {
+            "messageId": 1,
+            "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+            "messageType": 100,
+            "data": [123.0145612, 23.41576123, 34]
         }
 
 -----------

@@ -93,11 +93,18 @@ class Pos:
     orientation = Quaternion()
 
     def __init__(self, pos: list):
-        self.point = Point(pos[0][0], pos[0][1], pos[0][2])
-        self.orientation = Quaternion(pos[1][0], pos[1][1], pos[1][2], pos[1][3])
+        self.point = Point(pos[0], pos[1], pos[2])
+        self.orientation = Quaternion(pos[3], pos[4], pos[5], pos[6])
 
     def __list__(self):
-        return [self.point, self.orientation]
+        return [self.point.x,
+                self.point.y,
+                self.point.z,
+                self.orientation.x,
+                self.orientation.y,
+                self.orientation.z,
+                self.orientation.w
+                ]
 
     def __repr__(self):
         return self.__list__()

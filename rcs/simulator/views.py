@@ -39,7 +39,7 @@ class Simulator:
 
     def enable(self):
         try:
-            self._client.connect('localhost', 1883)
+            self._client.connect('192.168.1.1', 1883)
             self._heartbeat_scd.start()
             self._battery_scd.start()
             self._client.loop_start()
@@ -58,7 +58,7 @@ class Simulator:
             self._logger.error(e.__str__())
 
     def heartbeat(self):
-        self._client.publish('/root/{0}/heartbeat'.format(self._name), json.dumps({'time': '111'}))
+        self._client.publish('/root/{0}/heartbeat/ack'.format(self._name), json.dumps({'time': '111'}))
 
     def report_localization(self):
         if self._is_localization:

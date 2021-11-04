@@ -9,7 +9,7 @@ def success_response(headers=None, status=HTTP_200_OK, detail='success', data=''
     }, headers=headers)
 
 
-def error_response(headers=None, status=HTTP_500_INTERNAL_SERVER_ERROR, detail='success', data=''):
+def error_response(headers=None, status=HTTP_500_INTERNAL_SERVER_ERROR, detail='error', data=''):
     return Response(status=status, data={
         'detail': detail,
         'data': data

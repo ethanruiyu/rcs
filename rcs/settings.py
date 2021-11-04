@@ -39,12 +39,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'rcs.account',
-    'rcs.core',
+    'django_filters',
+    'colorfield',
     'rcs.simulator',
     'drf_spectacular',
     'rest_framework_simplejwt',
-    'channels'
+    'channels',
+    'rcs.account',
+    'rcs.common',
+    'rcs.map',
+    'rcs.communication',
+    'rcs.vehicle',
 ]
 
 REST_FRAMEWORK = {
@@ -104,7 +109,11 @@ DATABASES = {
         'NAME': 'rcs',
         'USER': 'rcs',
         'PASSWORD': '123456',
-        'HOST': '127.0.0.1'
+        'HOST': '127.0.0.1',
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+
+        }
     }
 }
 
@@ -144,6 +153,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 

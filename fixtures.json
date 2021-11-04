@@ -1,177 +1,62 @@
 [
   {
-    "model": "core.SystemSettingModel",
+    "model": "map.AreaTypeModel",
     "pk": 1,
     "fields": {
-      "key": "MissionPriorities",
-      "value": "BY_AGE",
-      "description": "Keys by which to prioritize transport orders for assignment.\nPossible values:\nBY_AGE: Sort by age, oldest first.\nBY_DEADLINE: Sort by deadline, most urgent first.\nDEADLINE_AT_RISK_FIRST: Sort orders with deadlines at risk first.\nBY_NAME: Sort by name, lexicographically."
+        "name": "Forbidden",
+        "description": "Forbidden Area",
+        "fillColor": "#EAACAC",
+        "strokeColor": "#EAACAC",
+        "action": null,
+        "fields": []
     }
   },
   {
-    "model": "core.SystemSettingModel",
+    "model": "map.AreaTypeModel",
     "pk": 2,
     "fields": {
-      "key": "VEHICLE_PRIORITIES",
-      "value": "IDLE_FIRST",
-      "description": "Keys by which to prioritize vehicle candidates for assignment.\nPossible values:\nBY_ENERGY_LEVEL: Sort by energy level of the vehicle, highest first.\nIDLE_FIRST: Sort vehicles with state IDLE first.\nBY_COMPLETE_ROUTING_COSTS: Sort by complete routing costs, lowest first.\nBY_INITIAL_ROUTING_COSTS: Sort by routing costs for the first destination.\nBY_VEHICLE_NAME: Sort by vehicle name, lexicographically."
+        "name": "Coverage",
+        "description": "Coverage Area",
+        "fillColor": "#27F7C0",
+        "strokeColor": "#27F7C0",
+        "action": null,
+        "fields": []
     }
   },
   {
-    "model": "core.SystemSettingModel",
+    "model": "map.AreaTypeModel",
     "pk": 3,
     "fields": {
-      "key": "AutoParking",
-      "value": false,
-      "description": "Whether to automatically create parking missions for idle vehicles."
+        "name": "Wall",
+        "description": "Wall",
+        "fillColor": "#747474",
+        "strokeColor": "#747474",
+        "action": null,
+        "fields": []
     }
   },
   {
-    "model": "core.SystemSettingModel",
-    "pk": 4,
-    "fields": {
-      "key": "AutoCharging",
-      "value": false,
-      "description": "Whether to automatically create recharge mission for idle vehicles."
-    }
-  },
-  {
-    "model": "core.SystemSettingModel",
-    "pk": 5,
-    "fields": {
-      "key": "IdleTime",
-      "value": 30,
-      "description": "Minimum of minutes a robot is allowed to idle, before it is sent to park point."
-    }
-  },
-  {
-    "model": "core.SystemSettingModel",
-    "pk": 6,
-    "fields": {
-      "key": "EnergyLevelSufficiently",
-      "value": 80,
-      "description": "The value at/above which the vehicle's energy level is considered\nsufficiently recharged.."
-    }
-  },
-  {
-    "model": "core.SystemSettingModel",
-    "pk": 7,
-    "fields": {
-      "key": "EnergyLevelCritical",
-      "value": 20,
-      "description": "The value at/below which the vehicle's energy level is considered\n'critical'."
-    }
-  },
-  {
-    "model": "core.VehicleTypeModel",
+    "model": "map.PointTypeModel",
     "pk": 1,
     "fields": {
-      "name": "Default",
-      "avatar": "http://localhost:8000/media/vehicles/Robot-1/1.png",
-      "action": "null"
+        "name": "Route",
+        "description": "Route Point",
+        "fillColor": "#28C76F",
+        "strokeColor": "#28C76F",
+        "action": null,
+        "fields": []
     }
   },
   {
-    "model": "core.ActionModel",
-    "pk": 1,
-    "fields": {
-      "name": "MOVE_TO_POSITION",
-      "action_type": "Move",
-      "active": true,
-      "parameters": {
-        "x": 0,
-        "y": 0,
-        "orientation": [
-          0,
-          0,
-          0,
-          1
-        ]
-      }
-    }
-  },
-  {
-    "model": "core.ActionModel",
+    "model": "map.PointTypeModel",
     "pk": 2,
     "fields": {
-      "name": "CHARGING",
-      "action_type": "Battery",
-      "active": true,
-      "parameters": {
-      }
-    }
-  },
-  {
-    "model": "core.ActionModel",
-    "pk": 3,
-    "fields": {
-      "name": "SWITCH_MAP",
-      "action_type": "Internal",
-      "active": true,
-      "parameters": {
-        "name": "",
-        "url": ""
-      }
-    }
-  },
-  {
-    "model": "core.ActionModel",
-    "pk": 4,
-    "fields": {
-      "name": "OPEN_CUTTER",
-      "action_type": "External",
-      "active": true,
-      "parameters": {
-        "cutter": true
-      }
-    }
-  },
-  {
-    "model": "core.ActionModel",
-    "pk": 5,
-    "fields": {
-      "name": "CLOSE_CUTTER",
-      "action_type": "External",
-      "active": true,
-      "parameters": {
-        "cutter": false
-      }
-    }
-  },
-    {
-    "model": "core.ActionModel",
-    "pk": 6,
-    "fields": {
-      "name": "WAIT",
-      "action_type": "Logic",
-      "active": true,
-      "parameters": {
-        "seconds": 0
-      }
-    }
-  },
-  {
-    "model": "core.ActionModel",
-    "pk": 7,
-    "fields": {
-      "name": "RELATIVE_MOVE",
-      "action_type": "Move",
-      "active": true,
-      "parameters": {
-        "seconds": 0
-      }
-    }
-  },
-  {
-    "model": "core.ActionModel",
-    "pk": 8,
-    "fields": {
-      "name": "RELATIVE_ROTATION",
-      "action_type": "Move",
-      "active": true,
-      "parameters": {
-        "seconds": 0
-      }
+        "name": "Charge",
+        "description": "Charge Point",
+        "fillColor": "#0786CE",
+        "strokeColor": "#0786CE",
+        "action": null,
+        "fields": []
     }
   }
 ]

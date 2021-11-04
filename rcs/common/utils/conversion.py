@@ -30,15 +30,15 @@ def euler2quaternion(roll, pitch, yaw):
     return [qx, qy, qz, qw], {'x': qx, 'y': qy, 'z': qz, 'w': qw}
 
 
-def navigation2image(nx, ny, config):
-    x = int((nx - config['origin'][0]) / config['resolution'])
-    y = int((config['height'] - (ny - config['origin'][1]) / config['resolution'] - 1))
+def navigation2image(nx, ny, instance):
+    x = int((nx - instance.originX) / instance.resolution)
+    y = int((instance.height - (ny - instance.originY) / instance.resolution - 1))
     z = 0
     return Point(x, y, z)
 
 
-def image2navigation(ix, iy, config):
-    x = ix * config['resolution'] + config['origin'][0]
-    y = (config['height'] - iy - 1) * config['resolution'] + config['origin'][1]
+def image2navigation(ix, iy, instance):
+    x = ix * instance.resolution + instance.originX
+    y = (instance.height - iy - 1) * instance.resolution + instance.originY
     z = 0
     return Point(x, y, z)
