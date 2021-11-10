@@ -1,5 +1,6 @@
 from django.db import models
 from colorfield.fields import ColorField
+from django.conf import settings
 
 
 class MapModel(models.Model):
@@ -21,6 +22,19 @@ class MapModel(models.Model):
     class Meta:
         db_table = 'rcs_map'
         verbose_name = 'Map'
+
+    def save(self, *args, **kwargs):
+        if self.active:
+            try:
+                temp = MapModel.objects.get(active=True)
+                # settings.ACTIVE_MAP_CONFIG = temp.config
+                if self != temp:
+                    temp.active = False
+                    temp.save()
+            except MapModel.DoesNotExist:
+                pass
+
+        super(MapModel, self).save(*args, **kwargs)
 
 
 class AreaTypeModel(models.Model):

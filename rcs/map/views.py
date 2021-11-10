@@ -7,7 +7,9 @@ from PIL import Image
 from django.db import models
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
-
+from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from .serializers import MapSerializer, PointSerializer, PointTypeSerializer, AreaSerializer, AreaTypeSerializer
 from .models import MapModel, PointModel, PointTypeModel, AreaModel, AreaTypeModel
 from .paginations import MapPagination
@@ -44,7 +46,7 @@ class MapViewSet(ModelViewSet):
             zip_file = request.data['file']
             zip_obj = zipfile.ZipFile(zip_file)
             for file in zip_obj.namelist():
-                zip_obj.extract(file, 'media/maps/{0}'.format(name))
+                zip_obj.extract(file, 'media/maps/{0}/'.format(name))
 
             # copy to plan png image
             shutil.copyfile('media/maps/{0}/map.png'.format(name),
@@ -67,7 +69,7 @@ class MapViewSet(ModelViewSet):
                 'media/maps/{0}/map.yaml'.format(name), 'r', encoding='utf-8')
             content = yaml_file.read()
             yaml_file.close()
-            config = yaml.load(content)
+            config = yaml.load(content, yaml.FullLoader)
             if self.queryset.filter(name=name).exists():
                 obj = self.queryset.get(name=name)
                 obj.width = width
@@ -135,6 +137,15 @@ class MapViewSet(ModelViewSet):
 
         return success_response(data=serializer.data)
 
+    @action(methods=['delete'], detail=False)
+    def multi_delete(self, request, *args, **kwargs):
+        delete_id = request.query_params.get('deleteid', None)
+        if not delete_id:
+            return error_response(status=status.HTTP_404_NOT_FOUND)
+
+        for i in delete_id.split(','):
+            get_object_or_404(MapModel, pk=int(i)).delete()
+        return success_response(status=status.HTTP_204_NO_CONTENT)
 
 class PointViewSet(ModelViewSet):
     serializer_class = PointSerializer

@@ -96,7 +96,7 @@ std::vector<cv::Point> plan(std::string imgPath, cv::Point start, cv::Point end,
     cv::Mat map1 = cv::imread(imgPath);
     cv::cvtColor(map1, tmp, cv::COLOR_BGR2GRAY);
     cv::threshold(tmp, tmp, 130, 255, cv::THRESH_BINARY_INV);
-    dilateMap(tmp, tmp, 20);
+    dilateMap(tmp, tmp, dilate);
     std::vector<cv::Point> res = jpsPlanner(start, end, tmp);
     return res;
 }

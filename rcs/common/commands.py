@@ -5,9 +5,12 @@ from rcs.common.types import Pos
 from ..common.utils.atomic_counter import AtomicCounter
 from datetime import datetime
 from threading import Event
+from .types import Point
+from ..plugins.planner.module import move_to_position
 
 
 MESSAGE_ID = AtomicCounter()
+
 
 class Command:
     def __init__(self):
@@ -32,21 +35,27 @@ class Command:
         }
 
     def __repr__(self):
-        return self.__dict__()
+        print(self.__dict__())
+        return json.dumps(self.__dict__())
 
 
-class Heartbeat(Command):
+class Heartbeat():
     topic = '/root/{0}/heartbeat/set'
 
     def __init__(self):
         super().__init__()
-        self._message_type = -1
+        self.data = {
+            "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+    def __repr__(self) -> str:
+        return json.dumps(self.data)
 
 
 class InitPosition(Command):
     topic = '/root/{0}/cmd/navigation/set'
-    event = Event()
-    def __init__(self, position: Pos):
+
+    def __init__(self, position):
         super(InitPosition, self).__init__()
         self._message_type = CommandEnum.INIT_POSITION.value
         self._data = position
@@ -62,6 +71,7 @@ class InitPosition(Command):
 
 class Drive(Command):
     topic = '/root/{0}/cmd/chassis/set'
+
     def __init__(self, speed):
         super(Drive, self).__init__()
         self._message_type = CommandEnum.DRIVE.value
@@ -74,3 +84,41 @@ class Drive(Command):
             'messageType': self._message_type,
             'data': self._data
         })
+
+
+class SwitchMap(Command):
+    topic = '/root/{0}/setting/map/set'
+
+    def __init__(self, map_name: str):
+        super(SwitchMap, self).__init__()
+        self._message_type = SettingEnum.SWITCH_MAP.value
+        self._data = map_name
+
+
+class Mission(Command):
+    topic = '/root/{0}/cmd/navigation/set'
+
+    def __init__(self, vehicle_current_position, width,  raw):
+        super(Mission, self).__init__()
+        self._message_type = CommandEnum.MISSION.value
+        start_position = Point(
+            x=vehicle_current_position[0], y=vehicle_current_position[1])
+        data = []
+        for step in raw:
+            if step['action'] == 'MOVE_TO_POSITION':
+                target_position = Point(
+                    x=step['parameters']['position'][0],
+                    y=step['parameters']['position'][1])
+                step_path = move_to_position(
+                    start_position,
+                    target_position,
+                    width)
+                start_position = target_position
+                data.append({
+                    'action': step['action'],
+                    'parameters': {
+                        "path": step_path,
+                        "seconds": None
+                    }
+                })
+        self._data = data

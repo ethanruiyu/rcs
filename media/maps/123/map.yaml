@@ -1,6 +1,6 @@
-image: /root/projects/AutoRS/Data/Maps/gecao_ws31/map.png
+image: map.png
 resolution: 0.05
-origin: [-24.00, -11.00, 0.0]
+origin:  [-13.4, -10.2, 0]
 occupied_thresh: 0.1
 free_thresh: 0.05
 negate: 0

@@ -32,7 +32,7 @@ def euler2quaternion(roll, pitch, yaw):
 
 def navigation2image(nx, ny, instance):
     x = int((nx - instance.originX) / instance.resolution)
-    y = int((instance.height - (ny - instance.originY) / instance.resolution - 1))
+    y = int(instance.height - (ny - instance.originY) / instance.resolution - 1)
     z = 0
     return Point(x, y, z)
 

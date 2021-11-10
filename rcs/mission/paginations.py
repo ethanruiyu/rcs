@@ -1,16 +1,16 @@
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
 from collections import OrderedDict
+from ..common.utils.response import success_response
 
 
-class MapPagination(PageNumberPagination):
+class MissionPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'pageSize'
     page_query_param = 'pageNo'
     max_page_size = 100
 
     def get_paginated_response(self, data):
-        return Response(OrderedDict([
+        return success_response(data=OrderedDict([
             ('next', self.get_next_link()),
             ('pageNo', self.page.number),
             ('previous', self.get_previous_link()),

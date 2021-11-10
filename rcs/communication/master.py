@@ -4,43 +4,33 @@ from ..vehicle.models import VehicleModel
 from ..common.types import VehicleState
 
 
-class Master(mqtt.Client):
-    def on_connect(self, client, obj, flags, rc):
-        pass
+class Master:
+    def __init__(self) -> None:
+        self._client = mqtt.Client(client_id='master', clean_session=True)
+        self._client.reconnect_delay_set(1, 10)
 
-    def run(self):
-        self.connect('192.168.1.8')
-        self.subscribe('/#')
-        self.message_callback_add('/root/+/heartbeat/ack', self.on_heartbeat)
-        self.message_callback_add('/root/+/log', self.on_vehicle_log)
+    def enable(self):
+        self.init_vehicle_adapter()
 
-        self.loop_start()
+        self._client.connect('192.168.1.5', 1883)
+        self._client.subscribe('/root/+/heartbeat/ack')
+        self._client.message_callback_add('/root/+/heartbeat/ack', self.on_heartbeat)
+        self._client.loop_start()
+
+    def disable(self):
+        self._client.disconnect()
+        self._client.loop_stop()
 
     def on_heartbeat(self, client, obj, msg):
-        """all vehicle heartbeat callback"""
         vehicle_name: str = msg.topic.split('/')[2]
-        if VehicleModel.objects.filter(name=vehicle_name).exists():
-            obj = VehicleModel.objects.get(name=vehicle_name)
-            if obj.state != VehicleState.IDLE:
-                obj.state = VehicleState.IDLE
-                obj.save()
-            if vehicle_name in VEHICLE_ADAPTERS.keys():
-                if isinstance(VEHICLE_ADAPTERS[vehicle_name], VehicleAdapter) \
-                        and not VEHICLE_ADAPTERS[vehicle_name].is_connected():
-                    VEHICLE_ADAPTERS[vehicle_name].restart()
-                else:
-                    VEHICLE_ADAPTERS[vehicle_name].heartbeat()
-            else:
-                vehicle_adapter = VehicleAdapter(vehicle_name)
-                vehicle_adapter.run()
-                VEHICLE_ADAPTERS[vehicle_name] = vehicle_adapter
+        if not VehicleModel.objects.filter(name=vehicle_name).exists():
+            SCAN_VEHICLES.append(vehicle_name)
 
-        # if not in database, add to SCAN_VEHICLES list
-        else:
-            if vehicle_name not in SCAN_VEHICLES:
-                SCAN_VEHICLES.append(vehicle_name)
-
-
-    def on_vehicle_log(self, client, obj, msg):
-        """all vehicle log callback"""
-        pass
+    def init_vehicle_adapter(self):
+        all_vehicle = VehicleModel.objects.all()
+        for vehicle in all_vehicle:
+            if vehicle.name not in VEHICLE_ADAPTERS.keys():
+                adapter = VehicleAdapter(vehicle.name)
+                VEHICLE_ADAPTERS[vehicle.name] = adapter
+                adapter.enable()
+            

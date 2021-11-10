@@ -19,4 +19,4 @@ pybind11_add_module(planner_module
   planner.cpp
 )
 
-target_link_libraries(planner_module PUBLIC ${OpenCV_LIBS} ${PROJECT_SOURCE_DIR}/GlobalPlanner/lib/libglobal_planner.so)
+target_link_libraries(planner_module PUBLIC ${OpenCV_LIBS} ${PROJECT_SOURCE_DIR}/GlobalPlanner/lib/libglobal_planner.dylib)

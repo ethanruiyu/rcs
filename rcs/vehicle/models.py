@@ -1,5 +1,7 @@
 from django.db import models
 from ..common.types import VehicleState
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 class VehicleModel(models.Model):
 
@@ -11,6 +13,8 @@ class VehicleModel(models.Model):
     rotation = models.FloatField(default=0)
     battery = models.IntegerField(default=0)
     ip = models.GenericIPAddressField(null=True)
+    width = models.FloatField(default=1)
+    map = models.CharField(max_length=256, null=True)
 
     class Meta:
         db_table = 'rcs_vehicle'

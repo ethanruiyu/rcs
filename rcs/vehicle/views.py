@@ -1,10 +1,11 @@
+from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from .models import VehicleModel
 from .serializers import VehicleSerializer
 from ..communication.adapter import SCAN_VEHICLES, VEHICLE_ADAPTERS
 from ..common.utils.response import error_response, success_response
-from ..common.commands import Drive, InitPosition
+from ..common.commands import Drive, InitPosition, SwitchMap
 
 
 class VehicleViewSet(ModelViewSet):
@@ -41,8 +42,10 @@ class VehicleViewSet(ModelViewSet):
         vehicle = self.get_object()
         command = InitPosition(position)
         adapter = VEHICLE_ADAPTERS.get(vehicle.name)
-        adapter.sync_publish(command)
-        return success_response(data='')
+        if adapter is None:
+            return error_response(detail='vehicle not online')
+        adapter.send_command(command)
+        return success_response(data='', detail='init position set success')
 
     @action(detail=True, methods=['post'])
     def drive(self, request, pk):
@@ -53,10 +56,38 @@ class VehicleViewSet(ModelViewSet):
             angular = data['angular']
 
             adapter = VEHICLE_ADAPTERS.get(vehicle.name)
-            adapter.async_publish(Drive({
+            adapter.send_command(Drive({
                 'linear': linear,
                 'angular': angular
             }))
         except Exception as e:
-            return error_response(data='', status=500)
+            return error_response(data=e.__str__, status=500)
         return success_response(data='', status=200)
+
+    @action(detail=True, methods=['post'])
+    def pause(self, request, pk):
+        return success_response(data='')
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        adapter = VEHICLE_ADAPTERS.get(instance.name)
+        if adapter is None:
+            return error_response(detail='vehicle not online')
+        adapter.send_command(SwitchMap(map_name=instance.map))
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return success_response(data=serializer.data, detail='settings update success', code=1)
+
+
+    def handle_exception(self, exc):
+        print(exc)
+        return super().handle_exception(exc)

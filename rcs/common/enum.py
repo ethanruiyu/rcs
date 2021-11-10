@@ -10,3 +10,7 @@ class CommandEnum(Enum):
     MISSION = 5
     SWITCH_MODE = 6
     DRIVE = 100
+
+
+class SettingEnum(Enum):
+    SWITCH_MAP = 0

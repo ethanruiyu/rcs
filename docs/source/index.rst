@@ -18,7 +18,6 @@ Contents
    :maxdepth: 3
 
    mqtt
-   http
    coordinate
 
 

@@ -27,3 +27,4 @@ templates/
 /media/
 .vscode/
 rcs/plugins/planner/build/
+.DS_Store

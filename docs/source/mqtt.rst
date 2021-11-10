@@ -7,7 +7,7 @@ MQTT API
 
 .. image:: images/mqtt.png
 
-``/cmd``
+/cmd
 ----------
 
 消息类型
@@ -39,6 +39,9 @@ MQTT API
     * - SWITCH_MODE
       - 6
       - 切换模式：0 导航模式，1 手动模式
+    * - MISSION
+      - 7
+      - 撤销任务
     * - DRIVE
       - 100
       - 移动

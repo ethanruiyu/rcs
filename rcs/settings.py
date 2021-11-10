@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rcs.map',
     'rcs.communication',
     'rcs.vehicle',
+    'rcs.mission'
 ]
 
 REST_FRAMEWORK = {
@@ -107,7 +108,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'rcs',
-        'USER': 'rcs',
+        'USER': 'root',
         'PASSWORD': '123456',
         'HOST': '127.0.0.1',
         'OPTIONS': {
@@ -140,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -226,4 +227,25 @@ SIMPLE_JWT = {
 ACTIVE_MAP_CONFIG = {
     'resolution': 0,
     'origin': []
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
 }

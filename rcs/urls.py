@@ -32,6 +32,7 @@ urlpatterns = [
     path('api/account/', include('rcs.account.urls')),
     path('api/', include('rcs.map.urls')),
     path('api/', include('rcs.vehicle.urls')),
+    path('api/', include('rcs.mission.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/doc/',
          SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
@@ -43,13 +44,13 @@ urlpatterns = [
         {"document_root": settings.MEDIA_ROOT, 'show_indexes': True}),
 ]
 
-sim = Simulator('Robot-1')
-sim.enable()
+# sim = Simulator('Robot-1')
+# sim.enable()
 
 
 
-master = Master('master', clean_session=True)
-master.run()
+master = Master()
+master.enable()
 
 # if MapModel.objects.filter(active=True).exists():
 #     settings.ACTIVE_MAP_CONFIG = MapModel.objects.filter(active=True).first().config

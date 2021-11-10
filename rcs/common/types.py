@@ -1,3 +1,6 @@
+from typing import List
+
+
 class VehicleState:
     OFFLINE = 'offline'
     IDLE = 'idle'
@@ -40,9 +43,9 @@ class Point:
     z: float = 0
 
     def __init__(self, x=0, y=0, z=0):
-        self.x = x
-        self.y = y
-        self.z = z
+        self.x = round(x, 2)
+        self.y = round(y, 2)
+        self.z = round(z, 2)
 
     def __tuple__(self):
         return (self.x, self.y)
@@ -93,8 +96,8 @@ class Pos:
     orientation = Quaternion()
 
     def __init__(self, pos: list):
-        self.point = Point(pos[0], pos[1], pos[2])
-        self.orientation = Quaternion(pos[3], pos[4], pos[5], pos[6])
+        self.point = Point(round(pos[0], 2), round(pos[1], 2), round(pos[2], 2))
+        self.orientation = Quaternion(round(pos[3], 2), round(pos[4], 2), round(pos[5], 2), round(pos[6], 2))
 
     def __list__(self):
         return [self.point.x,
@@ -108,3 +111,20 @@ class Pos:
 
     def __repr__(self):
         return self.__list__()
+
+
+class Vehicle:
+    state = VehicleState.OFFLINE
+    name: str = ''
+    x: float = 0
+    y: float = 0
+    orientation: List[float] = [0, 0, 0, 1]
+    online = False
+    
+    def __init__(self, vehicle_name: str) -> None:
+        self.name = vehicle_name
+
+    def set_position(self, position):
+        self.x = position[0]
+        self.y = position[1]
+        self.orientation = [position[3], position[4], position[5], position[6] ]
