@@ -12,6 +12,7 @@ from ..communication.adapter import VEHICLE_ADAPTERS
 from ..plugins.planner.module import move_to_position
 from ..common.types import Point
 from ..vehicle.models import VehicleModel
+from ..common.commands import Pause, Abort
 
 class MissionViewset(ModelViewSet):
     """Mission viewset"""
@@ -76,8 +77,17 @@ class MissionViewset(ModelViewSet):
 
     @action(methods=['post'], detail=True)
     def pause(self, request, pk):
+        value = request.data['value']
+        mission = self.get_object()
+        vehicle = mission.vehicle
+        adapter = VEHICLE_ADAPTERS.get(vehicle.name)
+        adapter.send_command(Pause(value))
         return success_response(data='')
 
     @action(methods=['post'], detail=True)
     def abort(self, request, pk):
+        mission = self.get_object()
+        vehicle = mission.vehicle
+        adapter = VEHICLE_ADAPTERS.get(vehicle.name)
+        adapter.send_command(Abort())
         return success_response(data='')

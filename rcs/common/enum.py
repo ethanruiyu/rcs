@@ -9,6 +9,7 @@ class CommandEnum(Enum):
     MAPPING_STOP = 4
     MISSION = 5
     SWITCH_MODE = 6
+    ABORT_MISSION = 7
     DRIVE = 100
 
 

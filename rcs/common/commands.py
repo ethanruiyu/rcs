@@ -101,6 +101,7 @@ class Mission(Command):
     def __init__(self, vehicle_current_position, width,  raw):
         super(Mission, self).__init__()
         self._message_type = CommandEnum.MISSION.value
+        self._path = []
         start_position = Point(
             x=vehicle_current_position[0], y=vehicle_current_position[1])
         data = []
@@ -114,6 +115,7 @@ class Mission(Command):
                     target_position,
                     width)
                 start_position = target_position
+                self._path.append(step_path)
                 data.append({
                     'action': step['action'],
                     'parameters': {
@@ -122,3 +124,26 @@ class Mission(Command):
                     }
                 })
         self._data = data
+
+    def get_path(self):
+        return self._path
+
+
+class Pause(Command):
+    topic = '/root/{0}/cmd/navigation/set'
+
+    def __init__(self, value):
+        super(Pause, self).__init__()
+        if value == 0:
+            self._message_type = CommandEnum.PAUSE.value
+        if value == 1:
+            self._message_type = CommandEnum.CONTINUE.value
+        self._data = None
+
+class Abort(Command):
+    topic = '/root/{0}/cmd/navigation/set'
+
+    def __init__(self):
+        super(Abort, self).__init__()
+        self._message_type = CommandEnum.ABORT_MISSION.value
+        self._data = None

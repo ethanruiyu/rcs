@@ -25,4 +25,5 @@ class MissionModel(models.Model):
 
 @receiver(post_save, sender=MissionModel)
 def mission_save_receiver(sender, instance, **kwargs):
-    DISPATCHER.put(instance)
+    if instance.state == 'raw':
+        DISPATCHER.put(instance)

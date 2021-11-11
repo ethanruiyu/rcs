@@ -5,8 +5,10 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from apscheduler.schedulers.background import BackgroundScheduler
 from threading import Timer
+
+from rcs.common.enum import CommandEnum
 from ..common.commands import Heartbeat
-from ..common.types import Vehicle
+from ..common.types import MissionState, Vehicle
 from ..common.types import VehicleState
 
 
@@ -15,8 +17,11 @@ class VehicleAdapter:
         self._client = mqtt.Client(
             client_id=vehicle_name + '-adapter', clean_session=True)
         self._vehicle = Vehicle(vehicle_name=vehicle_name)
+        self._mission = None
         self._heartbeat = BackgroundScheduler()
         self._heartbeat.add_job(self.heartbeat_job, 'interval', seconds=5)
+        self._vehicle_general = BackgroundScheduler()
+        self._vehicle_general.add_job(self.vehicle_general_job, 'interval', seconds=1)
         self._offline_toggle = None
         self._logger = logging.getLogger('django')
 
@@ -25,6 +30,8 @@ class VehicleAdapter:
         self._client.subscribe('/root/{0}/report/#'.format(self._vehicle.name))
         self._client.subscribe(
             '/root/{0}/cmd/+/ack'.format(self._vehicle.name))
+        self._client.subscribe(
+            '/root/{0}/cmd/+/notify'.format(self._vehicle.name))
         self._client.subscribe(
             '/root/{0}/setting/+/ack'.format(self._vehicle.name))
         self._client.subscribe(
@@ -36,10 +43,14 @@ class VehicleAdapter:
             '/root/{0}/cmd/+/ack'.format(self._vehicle.name),
             self.on_cmd_ack)
         self._client.message_callback_add(
+            '/root/{0}/cmd/+/notify'.format(self._vehicle.name),
+            self.on_cmd_notify)
+        self._client.message_callback_add(
             '/root/{0}/report/navigation/general'.format(self._vehicle.name),
             self.on_report_navigation_general)
         self._client.loop_start()
 
+        self._vehicle_general.start()
         self._heartbeat.start()
 
     def disable(self):
@@ -59,7 +70,16 @@ class VehicleAdapter:
             self._vehicle.name), str(message))
 
     def on_cmd_ack(self, client, obj, msg):
-        print(msg)
+        data = json.loads(msg.payload)
+        if data['messageType'] == CommandEnum.MISSION.value:
+            self._mission.state = MissionState.PROCESSED
+            self._vehicle.state = VehicleState.BUSY
+
+    def on_cmd_notify(self, client, obj, msg):
+        data = json.loads(msg.payload)
+        if data['messageType'] == CommandEnum.MISSION.value:
+            self._mission.state = MissionState.FINISHED
+            self._vehicle.state = VehicleState.IDLE
 
     def on_heartbeat(self, client, obj, msg):
         print(msg.payload)
@@ -89,6 +109,25 @@ class VehicleAdapter:
 
     def can_proceed(self):
         return self._vehicle.state == VehicleState.IDLE
+
+    def set_mission(self, mission):
+        self._mission = mission
+
+    def vehicle_general_job(self):
+        print('general')
+        path = []
+        if self._mission:
+            path = self._mission.path
+
+        message = {
+                'state': self._vehicle.state,
+                'path': path
+        }
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(self._vehicle.name, {
+            'type': 'general',
+            'message': message
+        })
 
 
 """

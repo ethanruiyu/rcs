@@ -5,7 +5,7 @@ from .models import VehicleModel
 from .serializers import VehicleSerializer
 from ..communication.adapter import SCAN_VEHICLES, VEHICLE_ADAPTERS
 from ..common.utils.response import error_response, success_response
-from ..common.commands import Drive, InitPosition, SwitchMap
+from ..common.commands import Drive, InitPosition, Pause, SwitchMap, Abort
 
 
 class VehicleViewSet(ModelViewSet):
@@ -66,6 +66,17 @@ class VehicleViewSet(ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def pause(self, request, pk):
+        value = request.data['value']
+        vehicle = self.get_object()
+        adapter = VEHICLE_ADAPTERS.get(vehicle.name)
+        adapter.send_command(Pause(value))
+        return success_response(data='')
+
+    @action(detail=True, methods=['post'])
+    def abort(self, request, pk):
+        vehicle = self.get_object()
+        adapter = VEHICLE_ADAPTERS.get(vehicle.name)
+        adapter.send_command(Abort())
         return success_response(data='')
 
     def update(self, request, *args, **kwargs):

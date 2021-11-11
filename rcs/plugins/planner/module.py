@@ -17,7 +17,7 @@ def move_to_position(init: Point, goal: Point, vehicle_width):
     image_goal_point = navigation2image(goal.x, goal.y, active_map)
 
     map_path = settings.MEDIA_ROOT + 'maps/' + name + '/plan.png'
-    image_coordinate_path = planner_module.plan(map_path, image_init_point.__tuple__(), image_goal_point.__tuple__(), vehicle_width * 0.5)
+    image_coordinate_path = planner_module.plan(map_path, image_init_point.__tuple__(), image_goal_point.__tuple__(), vehicle_width / active_map.resolution)
 
     path = []
     for i in image_coordinate_path:

@@ -39,7 +39,7 @@ MQTT API
     * - SWITCH_MODE
       - 6
       - 切换模式：0 导航模式，1 手动模式
-    * - MISSION
+    * - ABORT_MISSION
       - 7
       - 撤销任务
     * - DRIVE
@@ -244,6 +244,21 @@ MQTT API
             "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
             "messageType": 6,
             "data": 0
+        }
+
+撤销任务
+>>>>>>>>
+ * Topic
+    /root/**${vehicleId}**/cmd/navigation/set
+
+ * Content
+    .. code-block:: json
+
+        {
+            "messageId": 1,
+            "timestamp": "%yyyy-%mm-%dd %HH:%MM:%SS",
+            "messageType": 7,
+            "data": null
         }
 
 移动

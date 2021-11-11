@@ -128,3 +128,12 @@ class Vehicle:
         self.x = position[0]
         self.y = position[1]
         self.orientation = [position[3], position[4], position[5], position[6] ]
+
+
+class Mission:
+    state = MissionState.RAW
+    name: str = ''
+    sn: str = ''
+
+    def __init__(self, sn) -> None:
+        self.sn = sn

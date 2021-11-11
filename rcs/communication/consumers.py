@@ -52,3 +52,8 @@ class VehicleConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'navigation': event['message']
         }))
+        
+    async def general(self, event):
+        await self.send(text_data=json.dumps({
+            'general': event['message']
+        }))
