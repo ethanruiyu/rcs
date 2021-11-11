@@ -7,8 +7,7 @@
 #include <pybind11/numpy.h>
 #include "planner.h"
 #include "jps_planner.h"
-#include "normal_astar_planner.h"
-#include "quadtree_astar_planner/quadtree_astar_planner.h"
+#include "picecwise_jerk_path_optimizer.h"
 
 std::vector<cv::Point> jpsPlanner(const cv::Point &start, const cv::Point &end, cv::Mat &plan_map)
 {
@@ -19,7 +18,7 @@ std::vector<cv::Point> jpsPlanner(const cv::Point &start, const cv::Point &end, 
     calcjps.setStart(start);
     calcjps.setGoal(end);
     if (!calcjps.GetPath(resPoints))
-    {
+    { 
         std::cout << "failed to plan" << std::endl;
         return resPoints;
     }
@@ -30,51 +29,6 @@ std::vector<cv::Point> jpsPlanner(const cv::Point &start, const cv::Point &end, 
     return resPoints;
 }
 
-std::vector<cv::Point> quadtreeAstarPlanner(cv::Point& start, cv::Point& end, cv::Mat& plan_map, cv::Mat map_rgb)
-{
-    auto t1 = clock();
-    std::vector<cv::Point> astar_path;
-
-    quadtree_astar_planner planner1(10, "./../");
-    planner1.buildEnvQuadtree(plan_map);
-    auto t2 = clock();
-    double t_build = (double)(t2 - t1)/CLOCKS_PER_SEC;
-    int path_return = planner1.plan(start, end);
-    if(path_return != 0)
-    {
-        std::cout << "failed astar plan in Quadtree" << std::endl;
-        return astar_path;
-    }
-    std::cout << "success astar plan in Quadtree" << std::endl;
-    planner1.visualizePath(map_rgb);
-    astar_path = planner1.getPath();
-
-    double t_plan = (double)(clock() - t2)/CLOCKS_PER_SEC;
-    std::cout << " quadtree A star build tree take " << t_build << " s " << std::endl;
-    std::cout << " quadtree A star plan take " << t_plan << " s " << std::endl;
-
-    return astar_path;
-
-}
-
-std::vector<cv::Point> normalAstarPlanner(const cv::Point& start, const cv::Point& end, cv::Mat& plan_map)
-{
-    auto t1 = clock();
-    std::vector<cv::Point> astar_path;
-    NormalAstarPlanner astar;
-    astar.setMap(plan_map);
-    astar.setStart(start);
-    astar.setGoal(end);
-    if(!astar.makePlan(astar_path))
-    {
-        std::cout << "failed to plan" << std::endl;
-        return astar_path;
-    }
-
-    double t = (double)(clock() - t1)/CLOCKS_PER_SEC;
-    std::cout << " A star plan take " << t << " s " << std::endl;
-    return astar_path;
-}
 
 void dilateMap(cv::Mat src, cv::Mat &dst, int size)
 {
@@ -97,8 +51,20 @@ std::vector<cv::Point> plan(std::string imgPath, cv::Point start, cv::Point end,
     cv::cvtColor(map1, tmp, cv::COLOR_BGR2GRAY);
     cv::threshold(tmp, tmp, 130, 255, cv::THRESH_BINARY_INV);
     dilateMap(tmp, tmp, dilate);
-    std::vector<cv::Point> res = jpsPlanner(start, end, tmp);
-    return res;
+    std::vector<cv::Point> rescontours = jpsPlanner(start, end, tmp);
+
+    double resolution = 0.05;
+    double path_interval = 0.4;
+
+    double t1 = clock();
+    picecwiseJerkPathOptimizer picecwiseJerkPathOptimizer(tmp, path_interval, resolution);
+    picecwiseJerkPathOptimizer.setOriginPath(rescontours);
+    picecwiseJerkPathOptimizer.pathOptimize();
+    double t = (double) (clock() - t1) / CLOCKS_PER_SEC;
+    std::cout << " path opt take " << t << " s " << std::endl;
+//    picecwiseJerkPathOptimizer.visualizeFrenetPath();
+    picecwiseJerkPathOptimizer.visualize();
+    return rescontours;
 }
 
 PYBIND11_MODULE(planner_module, m)
