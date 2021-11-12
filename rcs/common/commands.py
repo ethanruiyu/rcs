@@ -121,8 +121,20 @@ class Mission(Command):
                     'parameters': {
                         "path": step_path,
                         "seconds": None
-                    }
+                    },
+                    'isFinal': False
                 })
+            if step['action'] == 'WAIT':
+                seconds = step['parameters']['seconds']
+                data.append({
+                    'action': step['action'],
+                    'parameters': {
+                        "path": None,
+                        "seconds": seconds
+                    },
+                    'isFinal': False
+                })
+        data[-1]['isFinal'] = True
         self._data = data
 
     def get_path(self):

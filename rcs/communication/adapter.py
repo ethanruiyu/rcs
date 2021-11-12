@@ -1,4 +1,5 @@
 import json
+from os import set_blocking
 import paho.mqtt.client as mqtt
 import logging
 from asgiref.sync import async_to_sync
@@ -7,16 +8,18 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from threading import Timer
 
 from rcs.common.enum import CommandEnum
+from rcs.vehicle.models import VehicleModel
 from ..common.commands import Heartbeat
 from ..common.types import MissionState, Vehicle
 from ..common.types import VehicleState
+from datetime import datetime
 
 
 class VehicleAdapter:
     def __init__(self, vehicle_name: str) -> None:
         self._client = mqtt.Client(
             client_id=vehicle_name + '-adapter', clean_session=True)
-        self._vehicle = Vehicle(vehicle_name=vehicle_name)
+        self._vehicle = VehicleModel.objects.get(name=vehicle_name)
         self._mission = None
         self._heartbeat = BackgroundScheduler()
         self._heartbeat.add_job(self.heartbeat_job, 'interval', seconds=5)
@@ -73,18 +76,36 @@ class VehicleAdapter:
         data = json.loads(msg.payload)
         if data['messageType'] == CommandEnum.MISSION.value:
             self._mission.state = MissionState.PROCESSED
+            self._mission.beginTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             self._vehicle.state = VehicleState.BUSY
+            self._vehicle.save()
+            self._mission.save()
+
 
     def on_cmd_notify(self, client, obj, msg):
         data = json.loads(msg.payload)
         if data['messageType'] == CommandEnum.MISSION.value:
-            self._mission.state = MissionState.FINISHED
-            self._vehicle.state = VehicleState.IDLE
+            if data['isFinal'] == True:
+                self._vehicle.state = VehicleState.IDLE
+                self._mission.state = MissionState.FINISHED
+                self._mission.finishTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                self._mission.save()
+                self._vehicle.save()
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)('master', {
+                        'type': 'notification',
+                        'message': 'Mission : {} complete'.format(self._mission.name)
+                    })
+                self._mission = None
+        
+        if data['messageType'] == CommandEnum.ABORT_MISSION.value:
+            self.abort_mission()
 
     def on_heartbeat(self, client, obj, msg):
         print(msg.payload)
         if self._vehicle.state == VehicleState.OFFLINE:
             self._vehicle.state = VehicleState.IDLE
+            self._vehicle.save()
         if self._offline_toggle:
             self._offline_toggle.cancel()
         self._offline_toggle = Timer(6, self.set_offline)
@@ -93,6 +114,7 @@ class VehicleAdapter:
 
     def set_offline(self):
         self._vehicle.state = VehicleState.OFFLINE
+        self._vehicle.save()
 
     def on_report_navigation_general(self, client, obj, msg):
         payload = json.loads(msg.payload)
@@ -128,6 +150,12 @@ class VehicleAdapter:
             'type': 'general',
             'message': message
         })
+
+    def abort_mission(self):
+        if self._mission:
+            self._mission.state = MissionState.ABORT
+            self._mission.save()
+            self._vehicle.state = VehicleState.IDLE
 
 
 """

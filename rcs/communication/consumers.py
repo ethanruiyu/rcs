@@ -25,8 +25,8 @@ class MasterConsumer(AsyncWebsocketConsumer):
         """
         pass
 
-    def notification(self, event):
-        pass
+    async def notification(self, event):
+        await self.send(text_data=event['message'])
 
 
 class VehicleConsumer(AsyncWebsocketConsumer):

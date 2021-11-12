@@ -12,5 +12,6 @@ class MissionFilter(django_filters.FilterSet):
         fields = {
             'name': ['exact'],
             'state': ['exact'],
-            'createTime': ['exact']
+            'createTime': ['exact'],
+            'isTemplate': ['exact']
         }

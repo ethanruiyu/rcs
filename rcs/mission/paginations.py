@@ -4,10 +4,10 @@ from ..common.utils.response import success_response
 
 
 class MissionPagination(PageNumberPagination):
-    page_size = 10
+    # page_size = 10
     page_size_query_param = 'pageSize'
     page_query_param = 'pageNo'
-    max_page_size = 100
+    # max_page_size = 100
 
     def get_paginated_response(self, data):
         return success_response(data=OrderedDict([
