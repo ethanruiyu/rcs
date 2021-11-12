@@ -1,6 +1,16 @@
+import os
+import shutil
 from django.db import models
-from colorfield.fields import ColorField
 from django.conf import settings
+from django.dispatch import receiver
+from colorfield.fields import ColorField
+
+
+def map_dir_name(instance, filename):
+    """
+    FileField prefix dir
+    """
+    return 'maps/{0}/{1}'.format(instance.name, filename)
 
 
 class MapModel(models.Model):
@@ -90,3 +100,18 @@ class AreaModel(models.Model):
 
     class Meta:
         db_table = 'rcs_area'
+
+
+@receiver(models.signals.post_delete, sender=MapModel)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    delete media files, When delete map obj
+    :param sender:
+    :param instance:
+    :param kwargs:
+    :return:
+    """
+    if instance.name:
+        map_dir_path = settings.MEDIA_ROOT + 'maps/' + instance.name
+        if os.path.isdir(map_dir_path):
+            shutil.rmtree(map_dir_path)
