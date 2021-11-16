@@ -33,6 +33,7 @@ urlpatterns = [
     path('api/', include('rcs.map.urls')),
     path('api/', include('rcs.vehicle.urls')),
     path('api/', include('rcs.mission.urls')),
+    path('api/', include('rcs.system.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/doc/',
          SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
