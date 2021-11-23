@@ -1,10 +1,10 @@
 from rest_framework.serializers import ModelSerializer
-from .models import SystemSetting
+from .models import SystemSettingModel
 
 
 class SystemSettingSerializer(ModelSerializer):
     """Serializer for System settings"""
 
     class Meta:
-        model = SystemSetting
+        model = SystemSettingModel
         fields = '__all__'

@@ -58,5 +58,58 @@
         "action": null,
         "fields": []
     }
+  },
+  {
+    "model": "system.SystemSettingModel",
+    "pl": 1,
+    "fields": {
+      "key": "Auto charging",
+      "value": false,
+      "description": "Whether to automatically create recharge mission for idle vehicles.",
+      "fieldType": "select",
+      "options": [
+        {
+          "label": "True",
+          "value": true
+        },
+        {
+          "label": "False",
+          "value": false
+        }
+      ]
+    }
+  },
+  {
+    "model": "system.SystemSettingModel",
+    "pl": 2,
+    "fields": {
+      "key": "Idle time",
+      "value": 10,
+      "description": "Minimum of minutes a robot is allowed to idle, before it is sent to park point.",
+      "fieldType": "input",
+      "options": []
+    }
+  },
+  {
+    "model": "system.SystemSettingModel",
+    "pl": 3,
+    "fields": {
+      "key": "Energy level critical",
+      "value": 20,
+      "description": "The value at/below which the vehicle's energy level is considered 'critical'.",
+      "fieldType": "input",
+      "options": []
+    }
+  },
+  {
+    "model": "system.SystemSettingModel",
+    "pl": 4,
+    "fields": {
+      "key": "Energy level sufficiently",
+      "value": 80,
+      "description": "The value at/above which the vehicle's energy level is considered sufficiently recharged.",
+      "fieldType": "input",
+      "options": []
+    }
   }
 ]

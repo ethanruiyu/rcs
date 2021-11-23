@@ -159,3 +159,12 @@ class Abort(Command):
         super(Abort, self).__init__()
         self._message_type = CommandEnum.ABORT_MISSION.value
         self._data = None
+
+
+class SwitchMode(Command):
+    topic = '/root/{0}/cmd/navigation/set'
+
+    def __init__(self, mode):
+        super(SwitchMode, self).__init__()
+        self._message_type = CommandEnum.SWITCH_MODE.value
+        self._data = mode

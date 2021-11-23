@@ -9,22 +9,24 @@ from threading import Timer
 
 from rcs.common.enum import CommandEnum
 from rcs.vehicle.models import VehicleModel
-from ..common.commands import Heartbeat
+from ..common.commands import Heartbeat, Pause
 from ..common.types import MissionState, Vehicle
 from ..common.types import VehicleState
 from datetime import datetime
+import requests
 
 
 class VehicleAdapter:
     def __init__(self, vehicle_name: str) -> None:
         self._client = mqtt.Client(
-            client_id=vehicle_name + '-adapter', clean_session=True)
+            client_id=vehicle_name + '-adapter1', clean_session=True)
         self._vehicle = VehicleModel.objects.get(name=vehicle_name)
         self._mission = None
         self._heartbeat = BackgroundScheduler()
         self._heartbeat.add_job(self.heartbeat_job, 'interval', seconds=5)
         self._vehicle_general = BackgroundScheduler()
-        self._vehicle_general.add_job(self.vehicle_general_job, 'interval', seconds=1)
+        self._vehicle_general.add_job(
+            self.vehicle_general_job, 'interval', seconds=1)
         self._offline_toggle = None
         self._logger = logging.getLogger('django')
 
@@ -81,10 +83,23 @@ class VehicleAdapter:
             self._vehicle.save()
             self._mission.save()
 
-
     def on_cmd_notify(self, client, obj, msg):
         data = json.loads(msg.payload)
         if data['messageType'] == CommandEnum.MISSION.value:
+
+            # Scan
+            self.send_command(Pause())
+
+            r = requests.post(url="http://192.168.2.153/nuc/scan", data={
+                "taskId": "1",
+                "project": "",
+                "building": "",
+                "suite": "",
+                "room": "",
+                "stage": ""
+            })
+            if r['result'] == "success":
+                pass
             if data['isFinal'] == True:
                 self._vehicle.state = VehicleState.IDLE
                 self._mission.state = MissionState.FINISHED
@@ -93,22 +108,22 @@ class VehicleAdapter:
                 self._vehicle.save()
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)('master', {
-                        'type': 'notification',
-                        'message': 'Mission : {} complete'.format(self._mission.name)
-                    })
+                    'type': 'notification',
+                    'message': 'Mission : {} complete'.format(self._mission.name)
+                })
                 self._mission = None
-        
+
         if data['messageType'] == CommandEnum.ABORT_MISSION.value:
             self.abort_mission()
 
     def on_heartbeat(self, client, obj, msg):
         print(msg.payload)
-        if self._vehicle.state == VehicleState.OFFLINE:
+        if self._vehicle.state != VehicleState.IDLE:
             self._vehicle.state = VehicleState.IDLE
             self._vehicle.save()
         if self._offline_toggle:
             self._offline_toggle.cancel()
-        self._offline_toggle = Timer(6, self.set_offline)
+        self._offline_toggle = Timer(10, self.set_offline)
         self._offline_toggle.setDaemon(True)
         self._offline_toggle.start()
 
@@ -142,8 +157,8 @@ class VehicleAdapter:
             path = self._mission.path
 
         message = {
-                'state': self._vehicle.state,
-                'path': path
+            'state': self._vehicle.state,
+            'path': path
         }
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(self._vehicle.name, {

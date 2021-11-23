@@ -5,7 +5,7 @@ from .models import VehicleModel
 from .serializers import VehicleSerializer
 from ..communication.adapter import SCAN_VEHICLES, VEHICLE_ADAPTERS
 from ..common.utils.response import error_response, success_response
-from ..common.commands import Drive, InitPosition, Pause, SwitchMap, Abort
+from ..common.commands import Drive, InitPosition, Pause, SwitchMap, Abort, SwitchMode
 
 
 class VehicleViewSet(ModelViewSet):
@@ -79,6 +79,15 @@ class VehicleViewSet(ModelViewSet):
         adapter.send_command(Abort())
         return success_response(data='')
 
+
+    @action(detail=True, methods=['post'])
+    def switch_mode(self, request, pk):
+        mode = request.data['mode']
+        vehicle = self.get_object()
+        adapter = VEHICLE_ADAPTERS.get(vehicle.name)
+        adapter.send_command(SwitchMode(mode=mode))
+        return success_response(data='')
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -97,8 +106,3 @@ class VehicleViewSet(ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return success_response(data=serializer.data, detail='settings update success', code=1)
-
-
-    def handle_exception(self, exc):
-        print(exc)
-        return super().handle_exception(exc)

@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'rcs.map',
     'rcs.communication',
     'rcs.vehicle',
-    'rcs.mission'
+    'rcs.mission',
+    'rcs.system',
 ]
 
 REST_FRAMEWORK = {

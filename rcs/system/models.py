@@ -9,8 +9,8 @@ class SystemSettingModel(models.Model):
     value = models.CharField(max_length=256)
     description = models.TextField(blank=True)
     fieldType = models.CharField(max_length=64, choices=FIELD_TYPE_CHOICES, db_column='fieldType')
-    options = models.JsonField(blank=True)
+    options = models.JSONField(blank=True)
 
     class Meta:
-        db_table = 'rcs_system'
-        verbose_name = 'System'
+        db_table = 'rcs_system_setting'
+        verbose_name = 'System Setting'

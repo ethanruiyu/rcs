@@ -23,7 +23,7 @@ class Master:
 
     def on_heartbeat(self, client, obj, msg):
         vehicle_name: str = msg.topic.split('/')[2]
-        if not VehicleModel.objects.filter(name=vehicle_name).exists():
+        if not VehicleModel.objects.filter(name=vehicle_name).exists() and vehicle_name not in SCAN_VEHICLES:
             SCAN_VEHICLES.append(vehicle_name)
 
     def init_vehicle_adapter(self):
